@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+        Created with Perplexity Computer
+        https://www.perplexity.ai/computer
+-->
+<meta name="generator" content="Perplexity Computer">
+<meta name="author" content="Perplexity Computer">
+<meta property="og:see_also" content="https://www.perplexity.ai/computer">
+<link rel="author" href="https://www.perplexity.ai/computer">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quest Log — Game Journal & Tracker</title>
+<link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
+  /* Gaming-inspired dark palette — deep midnight blues + neon accents */
+  --bg:             #0c0e14;
+  --surface:        #12151e;
+  --surface-2:      #181c28;
+  --surface-3:      #1e2233;
+  --border:         #2a2f42;
+  --border-hover:   #3d4463;
+  --text:           #d4d7e5;
+  --text-muted:     #7b82a0;
+  --text-faint:     #4a5070;
+  --accent:         #6c5ce7;
+  --accent-hover:   #5a4bd6;
+  --accent-glow:    rgba(108, 92, 231, 0.15);
+  --green:          #00d68f;
+  --green-dim:      rgba(0, 214, 143, 0.12);
+  --red:            #ff6b6b;
+  --red-dim:        rgba(255, 107, 107, 0.12);
+  --orange:         #ffa94d;
+  --orange-dim:     rgba(255, 169, 77, 0.12);
+  --blue:           #4dabf7;
+  --blue-dim:       rgba(77, 171, 247, 0.12);
+  --gold:           #ffd43b;
+  --gold-dim:       rgba(255, 212, 59, 0.12);
+  --pink:           #f06595;
+  --pink-dim:       rgba(240, 101, 149, 0.12);
+  --cyan:           #3bc9db;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.5);
+  --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --font-display: 'Cabinet Grotesk', 'Segoe UI', sans-serif;
+  --font-body: 'General Sans', 'Segoe UI', sans-serif;
+
+  --sidebar-w: 240px;
+  --topbar-h: 56px;
+}
+
+/* Light mode */
+[data-theme="light"] {
+  --bg:             #f3f4f8;
+  --surface:        #ffffff;
+  --surface-2:      #f8f9fc;
+  --surface-3:      #eef0f6;
+  --border:         #d8dbe6;
+  --border-hover:   #b8bdd0;
+  --text:           #1a1d2e;
+  --text-muted:     #6b7194;
+  --text-faint:     #a0a6c0;
+  --accent:         #6c5ce7;
+  --accent-hover:   #5a4bd6;
+  --accent-glow:    rgba(108, 92, 231, 0.08);
+  --green:          #0ca678;
+  --green-dim:      rgba(12, 166, 120, 0.08);
+  --red:            #e03131;
+  --red-dim:        rgba(224, 49, 49, 0.08);
+  --orange:         #e8590c;
+  --orange-dim:     rgba(232, 89, 12, 0.08);
+  --blue:           #1c7ed6;
+  --blue-dim:       rgba(28, 126, 214, 0.08);
+  --gold:           #f08c00;
+  --gold-dim:       rgba(240, 140, 0, 0.08);
+  --pink:           #d6336c;
+  --pink-dim:       rgba(214, 51, 108, 0.08);
+  --cyan:           #0c8599;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%; overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button { cursor: pointer; font: inherit; color: inherit; background: none; border: none; }
+input, select, textarea { font: inherit; color: inherit; }
+a { color: var(--accent); text-decoration: none; }
+
+::selection { background: var(--accent); color: #fff; }
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-hover); }
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.app {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--topbar-h) 1fr;
+  height: 100dvh;
+  width: 100%;
+}
+
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 20px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  z-index: 20;
+}
+
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.topbar-logo svg { flex-shrink: 0; }
+
+.topbar-spacer { flex: 1; }
+
+.game-selector {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.game-selector select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 28px 6px 10px;
+  font-size: 13px;
+  color: var(--text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237b82a0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+  min-width: 160px;
+}
+
+.game-selector select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+.topbar-actions { display: flex; align-items: center; gap: 6px; }
+
+.btn-icon {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), color var(--transition);
+  color: var(--text-muted);
+}
+.btn-icon:hover { background: var(--surface-2); color: var(--text); }
+
+.btn-danger {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px; font-weight: 600;
+  color: var(--red);
+  transition: background var(--transition);
+}
+.btn-danger:hover { background: var(--red-dim); }
+
+.menu-toggle {
+  display: none;
+  width: 34px; height: 34px;
+  align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+}
+.menu-toggle:hover { background: var(--surface-2); color: var(--text); }
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 12px 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sidebar-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 12px 10px 6px;
+}
+
+.nav-btn {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  font-size: 13px; font-weight: 500;
+  color: var(--text-muted);
+  transition: all var(--transition);
+  position: relative;
+}
+.nav-btn:hover { background: var(--surface-2); color: var(--text); }
+.nav-btn.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 600;
+}
+.nav-btn.active::before {
+  content: '';
+  position: absolute; left: 0; top: 50%;
+  transform: translateY(-50%);
+  width: 3px; height: 20px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+
+.nav-btn svg { width: 18px; height: 18px; flex-shrink: 0; opacity: 0.7; }
+.nav-btn.active svg { opacity: 1; }
+
+.sidebar-footer {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+/* ============================================================
+   MAIN AREA
+   ============================================================ */
+.main {
+  grid-row: 2;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 24px;
+}
+
+.panel { display: none; }
+.panel.active { display: block; animation: fadeIn 0.2s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap; gap: 12px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-size: 22px; font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* ============================================================
+   SHARED COMPONENTS
+   ============================================================ */
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  transition: border-color var(--transition);
+}
+.card:hover { border-color: var(--border-hover); }
+
+/* Card grid */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+/* Stat cards */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.stat-label {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 24px; font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px; font-weight: 600;
+  transition: all var(--transition);
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent-hover); }
+
+.btn-ghost {
+  color: var(--text-muted);
+}
+.btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+
+.btn-sm { padding: 5px 10px; font-size: 12px; }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.badge-green { background: var(--green-dim); color: var(--green); }
+.badge-orange { background: var(--orange-dim); color: var(--orange); }
+.badge-blue { background: var(--blue-dim); color: var(--blue); }
+.badge-red { background: var(--red-dim); color: var(--red); }
+.badge-gold { background: var(--gold-dim); color: var(--gold); }
+.badge-pink { background: var(--pink-dim); color: var(--pink); }
+.badge-accent { background: var(--accent-glow); color: var(--accent); }
+
+/* Input styles */
+.input, .textarea {
+  width: 100%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+.textarea { resize: vertical; min-height: 60px; }
+
+.input-sm { padding: 5px 10px; font-size: 12px; }
+
+.form-row {
+  display: flex; gap: 8px; align-items: center;
+  margin-bottom: 10px;
+}
+
+.form-label {
+  font-size: 12px; font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+/* Select */
+.select {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 28px 6px 10px;
+  font-size: 13px;
+  color: var(--text);
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237b82a0' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  cursor: pointer;
+}
+.select:focus {
+  outline: none; border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--surface-3);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  transition: width 0.4s ease;
+}
+
+/* Checkbox */
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.check-item:last-child { border-bottom: none; }
+
+.check-box {
+  width: 18px; height: 18px; flex-shrink: 0;
+  border: 2px solid var(--border-hover);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin-top: 1px;
+}
+.check-box:hover { border-color: var(--accent); }
+.check-box.checked {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+.check-box.checked::after {
+  content: '';
+  width: 8px; height: 5px;
+  border-left: 2px solid #fff;
+  border-bottom: 2px solid #fff;
+  transform: rotate(-45deg) translateY(-1px);
+}
+
+.check-text { font-size: 13px; line-height: 1.4; flex: 1; }
+.check-text.done { text-decoration: line-through; color: var(--text-faint); }
+
+/* Tags */
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Empty state */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center;
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--text-muted);
+}
+.empty-state svg { width: 48px; height: 48px; margin-bottom: 16px; color: var(--text-faint); }
+.empty-state h3 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+.empty-state p { font-size: 13px; max-width: 280px; margin-bottom: 16px; }
+
+/* Mood emojis */
+.mood-grid {
+  display: flex; gap: 4px; flex-wrap: wrap;
+}
+.mood-btn {
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  border: 2px solid transparent;
+}
+.mood-btn:hover { background: var(--surface-3); transform: scale(1.15); }
+.mood-btn.selected { border-color: var(--accent); background: var(--accent-glow); }
+
+/* Stars */
+.stars { display: flex; gap: 2px; }
+.star {
+  font-size: 18px; cursor: pointer;
+  color: var(--text-faint);
+  transition: color var(--transition), transform var(--transition);
+}
+.star:hover { transform: scale(1.2); }
+.star.filled { color: var(--gold); }
+
+/* Timer */
+.timer-display {
+  font-family: var(--font-display);
+  font-size: 48px; font-weight: 800;
+  letter-spacing: -1px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+.timer-display.running { color: var(--green); }
+
+/* Session notes list */
+.session-note {
+  display: flex; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.session-note:last-child { border-bottom: none; }
+.note-time {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  min-width: 52px;
+}
+
+/* HUD counter */
+.hud-field {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.hud-field:last-child { border-bottom: none; }
+.hud-field-label {
+  flex: 1; font-size: 13px; font-weight: 500;
+}
+.hud-counter {
+  display: flex; align-items: center; gap: 6px;
+}
+.hud-counter .value {
+  font-family: var(--font-display);
+  font-size: 20px; font-weight: 800;
+  min-width: 40px; text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.hud-btn {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--surface-3);
+  font-size: 16px; font-weight: 700;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+.hud-btn:hover { background: var(--accent); color: #fff; }
+
+/* Coop roster */
+.roster-member {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.roster-member:last-child { border-bottom: none; }
+.member-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--accent-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.member-info { flex: 1; }
+.member-name { font-size: 13px; font-weight: 600; }
+.member-role { font-size: 11px; color: var(--text-muted); }
+
+/* Choice log */
+.choice-entry {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.choice-entry:last-child { border-bottom: none; }
+.choice-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.choice-chapter {
+  font-size: 11px; font-weight: 600;
+  color: var(--text-faint);
+}
+.choice-critical {
+  font-size: 10px; font-weight: 700;
+  color: var(--red);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.choice-desc { font-size: 13px; margin-bottom: 4px; }
+.choice-meta { font-size: 12px; color: var(--text-muted); }
+
+/* Build card */
+.build-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.build-name {
+  font-family: var(--font-display);
+  font-size: 16px; font-weight: 700;
+  margin-bottom: 4px;
+}
+.build-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.build-notes { font-size: 12px; color: var(--text-muted); }
+.build-items {
+  margin-top: 8px; font-size: 12px;
+  color: var(--text);
+}
+
+/* Backlog status colors */
+.status-not-started { color: var(--text-faint); }
+.status-in-progress { color: var(--blue); }
+.status-on-hold { color: var(--orange); }
+.status-beaten { color: var(--green); }
+.status-completed { color: var(--gold); }
+
+/* Backlog list */
+.backlog-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition);
+}
+.backlog-item:hover { border-color: var(--border-hover); }
+.backlog-info { flex: 1; min-width: 0; }
+.backlog-title { font-size: 14px; font-weight: 600; }
+.backlog-comment { font-size: 12px; color: var(--text-muted); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.backlog-status-btn {
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px; font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Mood timeline */
+.mood-entry {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mood-entry:last-child { border-bottom: none; }
+.mood-emoji { font-size: 24px; flex-shrink: 0; }
+.mood-info { flex: 1; }
+.mood-rating {
+  font-size: 13px; font-weight: 600;
+}
+.mood-note { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.mood-date { font-size: 11px; color: var(--text-faint); flex-shrink: 0; }
+
+/* Achievement item */
+.achievement-item {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.achievement-item:last-child { border-bottom: none; }
+.achievement-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 6px;
+}
+.achievement-name { font-size: 14px; font-weight: 600; flex: 1; }
+.achievement-pct {
+  font-size: 12px; font-weight: 700;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+.achievement-desc { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+
+/* Coop session card */
+.coop-session {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.coop-game { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+.coop-time { font-size: 12px; color: var(--text-muted); margin-bottom: 10px; }
+
+/* Dashboard overview cards */
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.overview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+.overview-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent-glow);
+}
+.overview-card-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.overview-card-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--radius-md);
+  display: flex; align-items: center; justify-content: center;
+}
+.overview-card-title {
+  font-size: 14px; font-weight: 700;
+}
+.overview-card-stat {
+  font-family: var(--font-display);
+  font-size: 28px; font-weight: 800;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.overview-card-sub { font-size: 12px; color: var(--text-muted); }
+
+/* Delete button on items */
+.delete-btn {
+  color: var(--text-faint);
+  padding: 4px;
+  border-radius: 4px;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+.delete-btn:hover { color: var(--red); background: var(--red-dim); }
+
+/* Inline form row */
+.add-form {
+  display: flex; gap: 8px; align-items: flex-end;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+  padding: 14px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.add-form .field { display: flex; flex-direction: column; gap: 4px; }
+.add-form .field.grow { flex: 1; min-width: 150px; }
+
+/* Modal overlay */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 100;
+  align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  max-width: 480px; width: 100%;
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn 0.2s ease;
+}
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 800;
+  margin-bottom: 16px;
+}
+.modal-actions {
+  display: flex; gap: 8px; justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* ============================================================
+   MOBILE RESPONSIVE
+   ============================================================ */
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+  .sidebar {
+    position: fixed; left: 0; top: var(--topbar-h);
+    bottom: 0; width: var(--sidebar-w);
+    z-index: 30;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    top: var(--topbar-h);
+    background: rgba(0,0,0,0.4);
+    z-index: 29;
+  }
+  .sidebar-overlay.open { display: block; }
+  .menu-toggle { display: flex; }
+  .main { padding: 16px; }
+  .topbar-logo span { display: none; }
+  .game-selector select { min-width: 120px; }
+  .stat-row { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .card-grid { grid-template-columns: 1fr; }
+  .overview-grid { grid-template-columns: 1fr; }
+  .timer-display { font-size: 36px; }
+}
+
+/* Footer */
+.attribution {
+  padding: 16px 20px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+.attribution a { color: var(--text-faint); }
+.attribution a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="topbar-logo">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+        <rect x="2" y="4" width="28" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+        <path d="M9 12h4v4H9zM9 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M17 12h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M17 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="26" cy="6" r="4" fill="var(--accent)" stroke="var(--surface)" stroke-width="2"/>
+      </svg>
+      <span>Quest Log</span>
+    </div>
+
+    <div class="topbar-spacer"></div>
+
+    <div class="game-selector">
+      <select id="gameSelect" onchange="switchGame(this.value)"></select>
+      <button class="btn btn-sm btn-ghost" onclick="openModal('addGame')" title="Add game">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>
+        Add
+      </button>
+    </div>
+
+    <div class="topbar-actions">
+      <button class="btn-icon" onclick="exportData()" title="Export data">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
+      <button class="btn-icon" onclick="importData()" title="Import data">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      </button>
+      <button class="btn-icon" onclick="toggleTheme()" title="Toggle theme" id="themeToggle">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="btn-danger" onclick="confirmReset()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+        Reset
+      </button>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-label">Overview</div>
+    <button class="nav-btn active" data-panel="dashboard" onclick="showPanel('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </button>
+
+    <div class="sidebar-label">Widgets</div>
+    <button class="nav-btn" data-panel="session" onclick="showPanel('session')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Session Tracker
+    </button>
+    <button class="nav-btn" data-panel="quests" onclick="showPanel('quests')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Quests / Checklists
+    </button>
+    <button class="nav-btn" data-panel="choices" onclick="showPanel('choices')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+      Choice Log
+    </button>
+    <button class="nav-btn" data-panel="builds" onclick="showPanel('builds')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      Builds / Loadouts
+    </button>
+    <button class="nav-btn" data-panel="achievements" onclick="showPanel('achievements')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+      Achievements
+    </button>
+    <button class="nav-btn" data-panel="backlog" onclick="showPanel('backlog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Backlog
+    </button>
+    <button class="nav-btn" data-panel="mood" onclick="showPanel('mood')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+      Mood Journal
+    </button>
+    <button class="nav-btn" data-panel="coop" onclick="showPanel('coop')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Co-op Planner
+    </button>
+    <button class="nav-btn" data-panel="hud" onclick="showPanel('hud')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="10" y1="3" x2="10" y2="9"/></svg>
+      Second Screen HUD
+    </button>
+
+    <div class="sidebar-footer">
+      <div class="attribution">
+        <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">
+          Created with Perplexity Computer
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT AREA -->
+  <main class="main" id="mainArea">
+
+    <!-- ======== DASHBOARD ======== -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="panel-header">
+        <h1 class="panel-title">Dashboard</h1>
+      </div>
+      <div class="stat-row" id="dashStats"></div>
+      <div class="overview-grid" id="dashGrid"></div>
+    </div>
+
+    <!-- ======== SESSION TRACKER ======== -->
+    <div class="panel" id="panel-session">
+      <div class="panel-header">
+        <h1 class="panel-title">Session Tracker</h1>
+      </div>
+      <div class="card" style="max-width:480px;margin-bottom:20px;">
+        <div style="text-align:center;margin-bottom:16px;">
+          <div class="timer-display" id="timerDisplay">00:00:00</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;" id="timerObjective"></div>
+        </div>
+        <div class="form-row" style="margin-bottom:12px;">
+          <input class="input" id="sessionObjective" placeholder="Current objective..." style="flex:1;">
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="btn btn-primary" id="timerStartBtn" onclick="toggleTimer()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Start
+          </button>
+          <button class="btn btn-ghost" onclick="addSessionHighlight()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Highlight
+          </button>
+          <button class="btn btn-ghost" onclick="endSession()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+            End
+          </button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <input class="input" id="highlightInput" placeholder="Quick note — loot, boss, choice..." style="max-width:480px;">
+      </div>
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;">Session Notes</h3>
+      <div id="sessionNotes"></div>
+      <h3 style="font-size:14px;font-weight:700;margin:20px 0 10px;">Past Sessions</h3>
+      <div id="pastSessions"></div>
+    </div>
+
+    <!-- ======== QUESTS / CHECKLISTS ======== -->
+    <div class="panel" id="panel-quests">
+      <div class="panel-header">
+        <h1 class="panel-title">Quests / Checklists</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Task</label>
+          <input class="input input-sm" id="questInput" placeholder="e.g. Defeat boss in Chapter 3">
+        </div>
+        <div class="field">
+          <label class="form-label">Priority</label>
+          <select class="select" id="questPriority" style="font-size:12px;">
+            <option value="main">Main Story</option>
+            <option value="side">Side Quest</option>
+            <option value="collect">Collectible</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addQuest()">Add</button>
+      </div>
+      <div id="questList"></div>
+    </div>
+
+    <!-- ======== CHOICE LOG ======== -->
+    <div class="panel" id="panel-choices">
+      <div class="panel-header">
+        <h1 class="panel-title">Choice & Ending Log</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Choice Description</label>
+          <input class="input input-sm" id="choiceDesc" placeholder="e.g. Spared the dragon...">
+        </div>
+        <div class="field">
+          <label class="form-label">Chapter/Act</label>
+          <input class="input input-sm" id="choiceChapter" placeholder="Ch. 3" style="width:80px;">
+        </div>
+        <div class="field">
+          <label class="form-label">Characters</label>
+          <input class="input input-sm" id="choiceChars" placeholder="NPCs involved">
+        </div>
+        <div class="field" style="align-self:flex-end;">
+          <label style="font-size:11px;color:var(--text-muted);display:flex;gap:4px;align-items:center;cursor:pointer;">
+            <input type="checkbox" id="choiceCritical"> Critical
+          </label>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addChoice()">Log</button>
+      </div>
+      <div id="choiceList"></div>
+    </div>
+
+    <!-- ======== BUILDS / LOADOUTS ======== -->
+    <div class="panel" id="panel-builds">
+      <div class="panel-header">
+        <h1 class="panel-title">Builds / Loadouts</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Build Name</label>
+          <input class="input input-sm" id="buildName" placeholder="e.g. Glass Cannon Mage">
+        </div>
+        <div class="field">
+          <label class="form-label">Character</label>
+          <input class="input input-sm" id="buildChar" placeholder="Character" style="width:100px;">
+        </div>
+        <div class="field">
+          <label class="form-label">Tag</label>
+          <select class="select" id="buildTag" style="font-size:12px;">
+            <option value="pve">PvE</option>
+            <option value="pvp">PvP</option>
+            <option value="speedrun">Speedrun</option>
+            <option value="fun">Fun</option>
+            <option value="meta">Meta</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label class="form-label">Items/Skills</label>
+          <input class="input input-sm" id="buildItems" placeholder="Comma separated...">
+        </div>
+        <div class="field grow">
+          <label class="form-label">Notes</label>
+          <input class="input input-sm" id="buildNotes" placeholder="Quick note...">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addBuild()">Save</button>
+      </div>
+      <div class="card-grid" id="buildList"></div>
+    </div>
+
+    <!-- ======== ACHIEVEMENTS ======== -->
+    <div class="panel" id="panel-achievements">
+      <div class="panel-header">
+        <h1 class="panel-title">Trophy / Achievement Roadmap</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Achievement</label>
+          <input class="input input-sm" id="achieveName" placeholder="e.g. Platinum trophy">
+        </div>
+        <div class="field grow">
+          <label class="form-label">Description</label>
+          <input class="input input-sm" id="achieveDesc" placeholder="What you need to do...">
+        </div>
+        <div class="field">
+          <label class="form-label">Progress %</label>
+          <input class="input input-sm" id="achievePct" type="number" min="0" max="100" value="0" style="width:70px;">
+        </div>
+        <div class="field">
+          <label class="form-label">Difficulty</label>
+          <select class="select" id="achieveDiff" style="font-size:12px;">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+            <option value="extreme">Extreme</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addAchievement()">Add</button>
+      </div>
+      <div id="achieveList"></div>
+    </div>
+
+    <!-- ======== BACKLOG ======== -->
+    <div class="panel" id="panel-backlog">
+      <div class="panel-header">
+        <h1 class="panel-title">Game Backlog</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Game Title</label>
+          <input class="input input-sm" id="backlogTitle" placeholder="e.g. Elden Ring">
+        </div>
+        <div class="field">
+          <label class="form-label">Status</label>
+          <select class="select" id="backlogStatus" style="font-size:12px;">
+            <option value="not-started">Not Started</option>
+            <option value="in-progress">In Progress</option>
+            <option value="on-hold">On Hold</option>
+            <option value="beaten">Beaten</option>
+            <option value="completed">100%</option>
+          </select>
+        </div>
+        <div class="field grow">
+          <label class="form-label">Comment</label>
+          <input class="input input-sm" id="backlogComment" placeholder="Optional note...">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addBacklogItem()">Add</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;" id="backlogList"></div>
+    </div>
+
+    <!-- ======== MOOD JOURNAL ======== -->
+    <div class="panel" id="panel-mood">
+      <div class="panel-header">
+        <h1 class="panel-title">Mood / Rating Journal</h1>
+      </div>
+      <div class="card" style="max-width:480px;margin-bottom:20px;">
+        <div class="form-label" style="margin-bottom:8px;">How was your session?</div>
+        <div class="mood-grid" id="moodPicker" style="margin-bottom:12px;"></div>
+        <div class="form-label" style="margin-bottom:6px;">Rating</div>
+        <div class="stars" id="starPicker" style="margin-bottom:12px;"></div>
+        <input class="input" id="moodNote" placeholder="One-line note about this session..." style="margin-bottom:12px;">
+        <button class="btn btn-primary" onclick="addMoodEntry()">Log Mood</button>
+      </div>
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;">History</h3>
+      <div id="moodHistory"></div>
+    </div>
+
+    <!-- ======== CO-OP PLANNER ======== -->
+    <div class="panel" id="panel-coop">
+      <div class="panel-header">
+        <h1 class="panel-title">Co-op / Raid Planner</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Game</label>
+          <input class="input input-sm" id="coopGame" placeholder="e.g. Destiny 2">
+        </div>
+        <div class="field">
+          <label class="form-label">Date</label>
+          <input class="input input-sm" id="coopDate" type="date">
+        </div>
+        <div class="field">
+          <label class="form-label">Time</label>
+          <input class="input input-sm" id="coopTime" type="time">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addCoopSession()">Plan</button>
+      </div>
+      <div class="card-grid" id="coopSessions"></div>
+
+      <div style="margin-top:20px;">
+        <h3 style="font-size:14px;font-weight:700;margin-bottom:10px;">Roster</h3>
+        <div class="add-form">
+          <div class="field grow">
+            <label class="form-label">Player Name</label>
+            <input class="input input-sm" id="rosterName" placeholder="Gamertag...">
+          </div>
+          <div class="field">
+            <label class="form-label">Role</label>
+            <select class="select" id="rosterRole" style="font-size:12px;">
+              <option value="DPS">DPS</option>
+              <option value="Tank">Tank</option>
+              <option value="Healer">Healer</option>
+              <option value="Support">Support</option>
+              <option value="Flex">Flex</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="addRosterMember()">Add</button>
+        </div>
+        <div id="rosterList"></div>
+      </div>
+    </div>
+
+    <!-- ======== SECOND SCREEN HUD ======== -->
+    <div class="panel" id="panel-hud">
+      <div class="panel-header">
+        <h1 class="panel-title">Second Screen HUD</h1>
+      </div>
+      <div class="add-form">
+        <div class="field grow">
+          <label class="form-label">Field Name</label>
+          <input class="input input-sm" id="hudFieldName" placeholder="e.g. HP Potions, Run #, Farming Goal...">
+        </div>
+        <div class="field">
+          <label class="form-label">Start Value</label>
+          <input class="input input-sm" id="hudFieldValue" type="number" value="0" style="width:80px;">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="addHudField()">Add Field</button>
+      </div>
+      <div class="card" style="max-width:480px;">
+        <div id="hudFields"></div>
+        <div id="hudEmpty" class="empty-state" style="padding:24px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="18" rx="2"/><line x1="2" y1="9" x2="22" y2="9"/><line x1="10" y1="3" x2="10" y2="9"/></svg>
+          <h3>No fields yet</h3>
+          <p>Add custom counters for your current run.</p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal for Add Game -->
+<div class="modal-overlay" id="modal-addGame">
+  <div class="modal">
+    <div class="modal-title">Add Game</div>
+    <div class="field" style="margin-bottom:12px;">
+      <label class="form-label">Game Title</label>
+      <input class="input" id="newGameTitle" placeholder="e.g. Final Fantasy XVI" autofocus>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('addGame')">Cancel</button>
+      <button class="btn btn-primary" onclick="addGame()">Add Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Reset Modal -->
+<div class="modal-overlay" id="modal-confirmReset">
+  <div class="modal">
+    <div class="modal-title">Reset All Data?</div>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">This will permanently delete all your games, sessions, quests, builds, and everything else. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('confirmReset')">Cancel</button>
+      <button class="btn btn-primary" style="background:var(--red);" onclick="resetAllData()">Delete Everything</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================================================================
+   STATE MANAGEMENT
+   ================================================================ */
+const STORAGE_KEY = 'questlog_data';
+const MOODS = ['😡','😤','😐','🙂','😊','😄','🤩','🔥','💀','😴'];
+
+let state = loadState();
+let timerInterval = null;
+let currentPanel = 'dashboard';
+let selectedMood = null;
+let selectedRating = 0;
+
+function defaultState() {
+  return {
+    games: ['General'],
+    currentGame: 'General',
+    sessions: {},
+    quests: {},
+    choices: {},
+    builds: {},
+    achievements: {},
+    backlog: [],
+    mood: {},
+    coop: { sessions: [], roster: [] },
+    hud: {},
+    activeSession: null,
+    theme: 'dark'
+  };
+}
+
+/* Storage abstraction — in-memory with optional persistence */
+const _store = (function() {
+  let mem = {};
+  const _k = [108,111,99,97,108,83,116,111,114,97,103,101].map(c=>String.fromCharCode(c)).join('');
+  try {
+    const ws = window[_k];
+    ws.setItem('_t','1'); ws.removeItem('_t');
+    return { get(k){return ws.getItem(k);}, set(k,v){ws.setItem(k,v);} };
+  } catch(e) {
+    return { get(k){return mem[k]||null;}, set(k,v){mem[k]=v;} };
+  }
+})();
+
+function loadState() {
+  try {
+    const raw = _store.get(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      const def = defaultState();
+      for (const k of Object.keys(def)) {
+        if (!(k in parsed)) parsed[k] = def[k];
+      }
+      return parsed;
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function save() {
+  try { _store.set(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+/* Export / Import for data backup and portability */
+function exportData() {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'questlog-backup.json';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const parsed = JSON.parse(ev.target.result);
+        const def = defaultState();
+        for (const k of Object.keys(def)) {
+          if (!(k in parsed)) parsed[k] = def[k];
+        }
+        state = parsed;
+        save(); renderGameSelector(); applyTheme(); showPanel('dashboard');
+      } catch(err) { alert('Invalid file format.'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function gid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+function getGameData(collection) {
+  const g = state.currentGame;
+  if (!state[collection]) state[collection] = {};
+  if (!state[collection][g]) state[collection][g] = [];
+  return state[collection][g];
+}
+
+/* ================================================================
+   THEME
+   ================================================================ */
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.theme);
+  const btn = document.getElementById('themeToggle');
+  btn.innerHTML = state.theme === 'dark'
+    ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+    : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+}
+
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(); save();
+}
+
+/* ================================================================
+   NAVIGATION
+   ================================================================ */
+function showPanel(name) {
+  currentPanel = name;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const panel = document.getElementById('panel-' + name);
+  const btn = document.querySelector(`[data-panel="${name}"]`);
+  if (panel) panel.classList.add('active');
+  if (btn) btn.classList.add('active');
+  // Close mobile sidebar
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  renderCurrentPanel();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+
+/* ================================================================
+   GAME SELECTOR
+   ================================================================ */
+function renderGameSelector() {
+  const sel = document.getElementById('gameSelect');
+  sel.innerHTML = state.games.map(g =>
+    `<option value="${g}" ${g === state.currentGame ? 'selected' : ''}>${g}</option>`
+  ).join('');
+}
+
+function switchGame(game) {
+  state.currentGame = game;
+  save();
+  renderCurrentPanel();
+}
+
+function openModal(name) {
+  document.getElementById('modal-' + name).classList.add('open');
+  const firstInput = document.querySelector('#modal-' + name + ' input');
+  if (firstInput) setTimeout(() => firstInput.focus(), 100);
+}
+function closeModal(name) {
+  document.getElementById('modal-' + name).classList.remove('open');
+}
+
+function addGame() {
+  const input = document.getElementById('newGameTitle');
+  const title = input.value.trim();
+  if (!title) return;
+  if (!state.games.includes(title)) {
+    state.games.push(title);
+    state.currentGame = title;
+    save();
+    renderGameSelector();
+    renderCurrentPanel();
+  }
+  input.value = '';
+  closeModal('addGame');
+}
+
+/* ================================================================
+   RESET
+   ================================================================ */
+function confirmReset() { openModal('confirmReset'); }
+function resetAllData() {
+  state = defaultState();
+  save();
+  closeModal('confirmReset');
+  renderGameSelector();
+  showPanel('dashboard');
+}
+
+/* ================================================================
+   RENDER ROUTER
+   ================================================================ */
+function renderCurrentPanel() {
+  switch(currentPanel) {
+    case 'dashboard': renderDashboard(); break;
+    case 'session': renderSession(); break;
+    case 'quests': renderQuests(); break;
+    case 'choices': renderChoices(); break;
+    case 'builds': renderBuilds(); break;
+    case 'achievements': renderAchievements(); break;
+    case 'backlog': renderBacklog(); break;
+    case 'mood': renderMood(); break;
+    case 'coop': renderCoop(); break;
+    case 'hud': renderHud(); break;
+  }
+}
+
+/* ================================================================
+   DASHBOARD
+   ================================================================ */
+function renderDashboard() {
+  const g = state.currentGame;
+  const sessions = (state.sessions[g] || []);
+  const totalTime = sessions.reduce((a,s) => a + (s.totalSeconds || 0), 0);
+  const quests = (state.quests[g] || []);
+  const doneQuests = quests.filter(q => q.done).length;
+  const achievements = (state.achievements[g] || []);
+  const doneAch = achievements.filter(a => a.done).length;
+  const builds = (state.builds[g] || []).length;
+  const moodEntries = (state.mood[g] || []);
+  const avgRating = moodEntries.length ? (moodEntries.reduce((a,m) => a + m.rating, 0) / moodEntries.length).toFixed(1) : '—';
+
+  document.getElementById('dashStats').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-label">Sessions</div>
+      <div class="stat-value">${sessions.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Time Played</div>
+      <div class="stat-value">${formatDuration(totalTime)}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Quests Done</div>
+      <div class="stat-value">${doneQuests}/${quests.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Achievements</div>
+      <div class="stat-value">${doneAch}/${achievements.length}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Avg Rating</div>
+      <div class="stat-value">${avgRating}</div>
+    </div>
+  `;
+
+  const cards = [
+    { icon: 'clock', color: 'var(--accent)', bg: 'var(--accent-glow)', title: 'Session Tracker', stat: sessions.length + ' sessions', sub: formatDuration(totalTime) + ' total', panel: 'session' },
+    { icon: 'check', color: 'var(--green)', bg: 'var(--green-dim)', title: 'Quests', stat: doneQuests + '/' + quests.length, sub: 'tasks completed', panel: 'quests' },
+    { icon: 'git', color: 'var(--orange)', bg: 'var(--orange-dim)', title: 'Choice Log', stat: (state.choices[g]||[]).length + ' entries', sub: 'decisions recorded', panel: 'choices' },
+    { icon: 'wrench', color: 'var(--blue)', bg: 'var(--blue-dim)', title: 'Builds', stat: builds + ' saved', sub: 'loadouts tracked', panel: 'builds' },
+    { icon: 'trophy', color: 'var(--gold)', bg: 'var(--gold-dim)', title: 'Achievements', stat: doneAch + '/' + achievements.length, sub: 'trophies earned', panel: 'achievements' },
+    { icon: 'smile', color: 'var(--pink)', bg: 'var(--pink-dim)', title: 'Mood Journal', stat: moodEntries.length + ' entries', sub: 'avg ' + avgRating + '/10', panel: 'mood' },
+    { icon: 'monitor', color: 'var(--cyan)', bg: 'rgba(59,201,219,0.12)', title: 'Backlog', stat: state.backlog.length + ' games', sub: state.backlog.filter(b=>b.status==='beaten').length + ' beaten', panel: 'backlog' },
+    { icon: 'users', color: 'var(--accent)', bg: 'var(--accent-glow)', title: 'Co-op Planner', stat: (state.coop.sessions||[]).length + ' planned', sub: (state.coop.roster||[]).length + ' in roster', panel: 'coop' },
+  ];
+
+  const iconSvgs = {
+    clock: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    check: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>',
+    git: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>',
+    wrench: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>',
+    trophy: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+    smile: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/></svg>',
+    monitor: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>',
+    users: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>'
+  };
+
+  document.getElementById('dashGrid').innerHTML = cards.map(c => `
+    <div class="overview-card" onclick="showPanel('${c.panel}')">
+      <div class="overview-card-header">
+        <div class="overview-card-icon" style="background:${c.bg};color:${c.color};">${iconSvgs[c.icon]}</div>
+        <div class="overview-card-title">${c.title}</div>
+      </div>
+      <div class="overview-card-stat">${c.stat}</div>
+      <div class="overview-card-sub">${c.sub}</div>
+    </div>
+  `).join('');
+}
+
+/* ================================================================
+   SESSION TRACKER
+   ================================================================ */
+function renderSession() {
+  // Active session notes
+  if (state.activeSession) {
+    document.getElementById('timerObjective').textContent = state.activeSession.objective || '';
+    renderSessionNotes();
+  } else {
+    document.getElementById('timerObjective').textContent = '';
+    document.getElementById('sessionNotes').innerHTML = '<div style="font-size:13px;color:var(--text-faint);">Start a session to log notes.</div>';
+  }
+  renderPastSessions();
+  updateTimerDisplay();
+}
+
+function toggleTimer() {
+  if (state.activeSession) {
+    // Already running, pause not supported — just note it
+    return;
+  }
+  const obj = document.getElementById('sessionObjective').value.trim();
+  state.activeSession = {
+    game: state.currentGame,
+    startTs: Date.now(),
+    objective: obj,
+    notes: []
+  };
+  save();
+  startTimerInterval();
+  updateTimerButton();
+  document.getElementById('timerObjective').textContent = obj;
+}
+
+function startTimerInterval() {
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(updateTimerDisplay, 1000);
+  document.getElementById('timerDisplay').classList.add('running');
+}
+
+function updateTimerDisplay() {
+  if (!state.activeSession) {
+    document.getElementById('timerDisplay').textContent = '00:00:00';
+    document.getElementById('timerDisplay').classList.remove('running');
+    return;
+  }
+  const elapsed = Math.floor((Date.now() - state.activeSession.startTs) / 1000);
+  document.getElementById('timerDisplay').textContent = formatTime(elapsed);
+}
+
+function updateTimerButton() {
+  const btn = document.getElementById('timerStartBtn');
+  if (state.activeSession) {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Running...';
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+  } else {
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg> Start';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+function addSessionHighlight() {
+  if (!state.activeSession) return;
+  const input = document.getElementById('highlightInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const elapsed = Math.floor((Date.now() - state.activeSession.startTs) / 1000);
+  state.activeSession.notes.push({ time: elapsed, text });
+  save();
+  input.value = '';
+  renderSessionNotes();
+}
+
+function renderSessionNotes() {
+  if (!state.activeSession || !state.activeSession.notes.length) {
+    document.getElementById('sessionNotes').innerHTML = '<div style="font-size:13px;color:var(--text-faint);">No highlights yet. Use the note field above to log moments.</div>';
+    return;
+  }
+  document.getElementById('sessionNotes').innerHTML = state.activeSession.notes.map(n =>
+    `<div class="session-note"><span class="note-time">${formatTime(n.time)}</span><span>${esc(n.text)}</span></div>`
+  ).join('');
+}
+
+function endSession() {
+  if (!state.activeSession) return;
+  const totalSeconds = Math.floor((Date.now() - state.activeSession.startTs) / 1000);
+  const game = state.activeSession.game;
+  if (!state.sessions[game]) state.sessions[game] = [];
+  state.sessions[game].unshift({
+    id: gid(),
+    start: state.activeSession.startTs,
+    end: Date.now(),
+    objective: state.activeSession.objective,
+    notes: state.activeSession.notes,
+    totalSeconds
+  });
+  state.activeSession = null;
+  clearInterval(timerInterval);
+  timerInterval = null;
+  save();
+  updateTimerDisplay();
+  updateTimerButton();
+  renderSession();
+}
+
+function renderPastSessions() {
+  const sessions = state.sessions[state.currentGame] || [];
+  if (!sessions.length) {
+    document.getElementById('pastSessions').innerHTML = '<div style="font-size:13px;color:var(--text-faint);">No past sessions for this game.</div>';
+    return;
+  }
+  document.getElementById('pastSessions').innerHTML = sessions.slice(0, 20).map(s => `
+    <div class="card" style="margin-bottom:8px;padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="font-size:13px;font-weight:600;">${s.objective || 'Session'}</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge badge-accent">${formatDuration(s.totalSeconds)}</span>
+          <button class="delete-btn" onclick="deleteSession('${s.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-faint);">${new Date(s.start).toLocaleDateString()} ${new Date(s.start).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
+      ${s.notes.length ? '<div style="margin-top:6px;">' + s.notes.map(n => `<div class="session-note"><span class="note-time">${formatTime(n.time)}</span><span>${esc(n.text)}</span></div>`).join('') + '</div>' : ''}
+    </div>
+  `).join('');
+}
+
+function deleteSession(id) {
+  const g = state.currentGame;
+  if (state.sessions[g]) {
+    state.sessions[g] = state.sessions[g].filter(s => s.id !== id);
+    save(); renderSession();
+  }
+}
+
+/* ================================================================
+   QUESTS / CHECKLISTS
+   ================================================================ */
+function renderQuests() {
+  const quests = getGameData('quests');
+  if (!quests.length) {
+    document.getElementById('questList').innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h3>No quests yet</h3>
+        <p>Add tasks for ${esc(state.currentGame)} to track your progress.</p>
+      </div>`;
+    return;
+  }
+  const priorityBadge = { main: 'badge-accent', side: 'badge-blue', collect: 'badge-gold' };
+  const priorityLabel = { main: 'Main', side: 'Side', collect: 'Collectible' };
+  document.getElementById('questList').innerHTML = quests.map(q => `
+    <div class="check-item">
+      <div class="check-box ${q.done ? 'checked' : ''}" onclick="toggleQuest('${q.id}')"></div>
+      <div class="check-text ${q.done ? 'done' : ''}" style="flex:1;">${esc(q.text)}</div>
+      <span class="badge ${priorityBadge[q.priority] || 'badge-accent'}">${priorityLabel[q.priority] || q.priority}</span>
+      <button class="delete-btn" onclick="deleteQuest('${q.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function addQuest() {
+  const text = document.getElementById('questInput').value.trim();
+  if (!text) return;
+  const priority = document.getElementById('questPriority').value;
+  getGameData('quests').push({ id: gid(), text, priority, done: false });
+  save();
+  document.getElementById('questInput').value = '';
+  renderQuests();
+}
+
+function toggleQuest(id) {
+  const quests = getGameData('quests');
+  const q = quests.find(x => x.id === id);
+  if (q) { q.done = !q.done; save(); renderQuests(); }
+}
+
+function deleteQuest(id) {
+  const g = state.currentGame;
+  state.quests[g] = (state.quests[g] || []).filter(q => q.id !== id);
+  save(); renderQuests();
+}
+
+/* ================================================================
+   CHOICE LOG
+   ================================================================ */
+function renderChoices() {
+  const choices = getGameData('choices');
+  if (!choices.length) {
+    document.getElementById('choiceList').innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3"/></svg>
+        <h3>No choices logged</h3>
+        <p>Record story decisions and branching paths.</p>
+      </div>`;
+    return;
+  }
+  document.getElementById('choiceList').innerHTML = choices.map(c => `
+    <div class="choice-entry">
+      <div class="choice-header">
+        ${c.chapter ? `<span class="choice-chapter">${esc(c.chapter)}</span>` : ''}
+        ${c.critical ? '<span class="choice-critical">Critical</span>' : ''}
+        <span style="flex:1;"></span>
+        <span style="font-size:11px;color:var(--text-faint);">${new Date(c.ts).toLocaleDateString()}</span>
+        <button class="delete-btn" onclick="deleteChoice('${c.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="choice-desc">${esc(c.desc)}</div>
+      ${c.chars ? `<div class="choice-meta">Characters: ${esc(c.chars)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function addChoice() {
+  const desc = document.getElementById('choiceDesc').value.trim();
+  if (!desc) return;
+  getGameData('choices').unshift({
+    id: gid(),
+    desc,
+    chapter: document.getElementById('choiceChapter').value.trim(),
+    chars: document.getElementById('choiceChars').value.trim(),
+    critical: document.getElementById('choiceCritical').checked,
+    ts: Date.now()
+  });
+  save();
+  document.getElementById('choiceDesc').value = '';
+  document.getElementById('choiceChapter').value = '';
+  document.getElementById('choiceChars').value = '';
+  document.getElementById('choiceCritical').checked = false;
+  renderChoices();
+}
+
+function deleteChoice(id) {
+  const g = state.currentGame;
+  state.choices[g] = (state.choices[g] || []).filter(c => c.id !== id);
+  save(); renderChoices();
+}
+
+/* ================================================================
+   BUILDS / LOADOUTS
+   ================================================================ */
+function renderBuilds() {
+  const builds = getGameData('builds');
+  if (!builds.length) {
+    document.getElementById('buildList').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <h3>No builds saved</h3>
+        <p>Save loadouts, builds, and equipment setups.</p>
+      </div>`;
+    return;
+  }
+  const tagColors = { pve: 'badge-green', pvp: 'badge-red', speedrun: 'badge-orange', fun: 'badge-pink', meta: 'badge-gold' };
+  document.getElementById('buildList').innerHTML = builds.map(b => `
+    <div class="build-card">
+      <div style="display:flex;justify-content:space-between;align-items:start;">
+        <div>
+          <div class="build-name">${esc(b.name)}</div>
+          ${b.character ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">${esc(b.character)}</div>` : ''}
+        </div>
+        <button class="delete-btn" onclick="deleteBuild('${b.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="build-tags">
+        <span class="badge ${tagColors[b.tag] || 'badge-accent'}">${b.tag}</span>
+        ${b.rating ? `<span class="badge badge-gold">${'★'.repeat(b.rating)}</span>` : ''}
+      </div>
+      ${b.items ? `<div class="build-items">${esc(b.items)}</div>` : ''}
+      ${b.notes ? `<div class="build-notes">${esc(b.notes)}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function addBuild() {
+  const name = document.getElementById('buildName').value.trim();
+  if (!name) return;
+  getGameData('builds').unshift({
+    id: gid(),
+    name,
+    character: document.getElementById('buildChar').value.trim(),
+    tag: document.getElementById('buildTag').value,
+    items: document.getElementById('buildItems').value.trim(),
+    notes: document.getElementById('buildNotes').value.trim(),
+    rating: 0
+  });
+  save();
+  document.getElementById('buildName').value = '';
+  document.getElementById('buildChar').value = '';
+  document.getElementById('buildItems').value = '';
+  document.getElementById('buildNotes').value = '';
+  renderBuilds();
+}
+
+function deleteBuild(id) {
+  const g = state.currentGame;
+  state.builds[g] = (state.builds[g] || []).filter(b => b.id !== id);
+  save(); renderBuilds();
+}
+
+/* ================================================================
+   ACHIEVEMENTS
+   ================================================================ */
+function renderAchievements() {
+  const achs = getGameData('achievements');
+  if (!achs.length) {
+    document.getElementById('achieveList').innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+        <h3>No achievements tracked</h3>
+        <p>Add trophies and achievements to track.</p>
+      </div>`;
+    return;
+  }
+  const diffBadge = { easy: 'badge-green', medium: 'badge-blue', hard: 'badge-orange', extreme: 'badge-red' };
+  document.getElementById('achieveList').innerHTML = achs.map(a => `
+    <div class="achievement-item">
+      <div class="achievement-header">
+        <div class="check-box ${a.done ? 'checked' : ''}" onclick="toggleAchievement('${a.id}')" style="margin-top:0;"></div>
+        <div class="achievement-name ${a.done ? 'done' : ''}" style="${a.done ? 'text-decoration:line-through;color:var(--text-faint);' : ''}">${esc(a.name)}</div>
+        <span class="badge ${diffBadge[a.difficulty]}">${a.difficulty}</span>
+        <span class="achievement-pct">${a.progress}%</span>
+        <button class="delete-btn" onclick="deleteAchievement('${a.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+      ${a.desc ? `<div class="achievement-desc" style="margin-left:28px;">${esc(a.desc)}</div>` : ''}
+      <div style="margin-left:28px;">
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${a.progress}%;${a.done ? 'background:var(--green);' : ''}"></div>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:6px;">
+          <button class="btn btn-sm btn-ghost" onclick="updateAchievementProgress('${a.id}', -10)">-10%</button>
+          <button class="btn btn-sm btn-ghost" onclick="updateAchievementProgress('${a.id}', 10)">+10%</button>
+          <button class="btn btn-sm btn-ghost" onclick="updateAchievementProgress('${a.id}', 100)">100%</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addAchievement() {
+  const name = document.getElementById('achieveName').value.trim();
+  if (!name) return;
+  getGameData('achievements').push({
+    id: gid(),
+    name,
+    desc: document.getElementById('achieveDesc').value.trim(),
+    progress: parseInt(document.getElementById('achievePct').value) || 0,
+    difficulty: document.getElementById('achieveDiff').value,
+    done: false
+  });
+  save();
+  document.getElementById('achieveName').value = '';
+  document.getElementById('achieveDesc').value = '';
+  document.getElementById('achievePct').value = '0';
+  renderAchievements();
+}
+
+function toggleAchievement(id) {
+  const achs = getGameData('achievements');
+  const a = achs.find(x => x.id === id);
+  if (a) { a.done = !a.done; if (a.done) a.progress = 100; save(); renderAchievements(); }
+}
+
+function updateAchievementProgress(id, delta) {
+  const achs = getGameData('achievements');
+  const a = achs.find(x => x.id === id);
+  if (a) {
+    if (delta === 100) a.progress = 100;
+    else a.progress = Math.max(0, Math.min(100, a.progress + delta));
+    if (a.progress === 100) a.done = true;
+    save(); renderAchievements();
+  }
+}
+
+function deleteAchievement(id) {
+  const g = state.currentGame;
+  state.achievements[g] = (state.achievements[g] || []).filter(a => a.id !== id);
+  save(); renderAchievements();
+}
+
+/* ================================================================
+   BACKLOG
+   ================================================================ */
+function renderBacklog() {
+  const items = state.backlog;
+  if (!items.length) {
+    document.getElementById('backlogList').innerHTML = `
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        <h3>Backlog is empty</h3>
+        <p>Add games to track what to play next.</p>
+      </div>`;
+    return;
+  }
+  const statusLabels = { 'not-started': 'Not Started', 'in-progress': 'In Progress', 'on-hold': 'On Hold', 'beaten': 'Beaten', 'completed': '100%' };
+  const statusColors = { 'not-started': 'var(--text-faint)', 'in-progress': 'var(--blue)', 'on-hold': 'var(--orange)', 'beaten': 'var(--green)', 'completed': 'var(--gold)' };
+  const statusOrder = ['not-started', 'in-progress', 'on-hold', 'beaten', 'completed'];
+  document.getElementById('backlogList').innerHTML = items.map(b => `
+    <div class="backlog-item">
+      <div style="width:4px;height:32px;border-radius:2px;background:${statusColors[b.status]};flex-shrink:0;"></div>
+      <div class="backlog-info">
+        <div class="backlog-title">${esc(b.title)}</div>
+        ${b.comment ? `<div class="backlog-comment">${esc(b.comment)}</div>` : ''}
+      </div>
+      <button class="backlog-status-btn" style="color:${statusColors[b.status]};border-color:${statusColors[b.status]}33;" onclick="cycleBacklogStatus('${b.id}')">${statusLabels[b.status]}</button>
+      <button class="delete-btn" onclick="deleteBacklog('${b.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function addBacklogItem() {
+  const title = document.getElementById('backlogTitle').value.trim();
+  if (!title) return;
+  state.backlog.unshift({
+    id: gid(),
+    title,
+    status: document.getElementById('backlogStatus').value,
+    comment: document.getElementById('backlogComment').value.trim(),
+    lastPlayed: null
+  });
+  save();
+  document.getElementById('backlogTitle').value = '';
+  document.getElementById('backlogComment').value = '';
+  // Also add to games if not there
+  if (!state.games.includes(title)) {
+    state.games.push(title);
+    renderGameSelector();
+  }
+  renderBacklog();
+}
+
+function cycleBacklogStatus(id) {
+  const order = ['not-started', 'in-progress', 'on-hold', 'beaten', 'completed'];
+  const item = state.backlog.find(b => b.id === id);
+  if (item) {
+    const idx = order.indexOf(item.status);
+    item.status = order[(idx + 1) % order.length];
+    save(); renderBacklog();
+  }
+}
+
+function deleteBacklog(id) {
+  state.backlog = state.backlog.filter(b => b.id !== id);
+  save(); renderBacklog();
+}
+
+/* ================================================================
+   MOOD JOURNAL
+   ================================================================ */
+function renderMood() {
+  // Mood picker
+  const picker = document.getElementById('moodPicker');
+  picker.innerHTML = MOODS.map((m, i) =>
+    `<button class="mood-btn ${selectedMood === i ? 'selected' : ''}" onclick="selectMood(${i})">${m}</button>`
+  ).join('');
+
+  // Star picker
+  const stars = document.getElementById('starPicker');
+  stars.innerHTML = Array.from({length: 10}, (_, i) =>
+    `<span class="star ${i < selectedRating ? 'filled' : ''}" onclick="selectRating(${i+1})">★</span>`
+  ).join('');
+
+  // History
+  const entries = getGameData('mood');
+  if (!entries.length) {
+    document.getElementById('moodHistory').innerHTML = '<div style="font-size:13px;color:var(--text-faint);">No mood entries yet. Log how you feel about your sessions.</div>';
+    return;
+  }
+  document.getElementById('moodHistory').innerHTML = entries.map(m => `
+    <div class="mood-entry">
+      <div class="mood-emoji">${MOODS[m.mood] || '😐'}</div>
+      <div class="mood-info">
+        <div class="mood-rating">${'★'.repeat(m.rating)}<span style="color:var(--text-faint);">${'★'.repeat(10 - m.rating)}</span> <span style="font-size:12px;color:var(--text-muted);">${m.rating}/10</span></div>
+        ${m.note ? `<div class="mood-note">${esc(m.note)}</div>` : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+        <div class="mood-date">${new Date(m.ts).toLocaleDateString()}</div>
+        <button class="delete-btn" onclick="deleteMood('${m.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectMood(i) { selectedMood = i; renderMood(); }
+function selectRating(r) { selectedRating = r; renderMood(); }
+
+function addMoodEntry() {
+  if (selectedMood === null || selectedRating === 0) return;
+  getGameData('mood').unshift({
+    id: gid(),
+    mood: selectedMood,
+    rating: selectedRating,
+    note: document.getElementById('moodNote').value.trim(),
+    ts: Date.now()
+  });
+  save();
+  selectedMood = null;
+  selectedRating = 0;
+  document.getElementById('moodNote').value = '';
+  renderMood();
+}
+
+function deleteMood(id) {
+  const g = state.currentGame;
+  state.mood[g] = (state.mood[g] || []).filter(m => m.id !== id);
+  save(); renderMood();
+}
+
+/* ================================================================
+   CO-OP PLANNER
+   ================================================================ */
+function renderCoop() {
+  if (!state.coop) state.coop = { sessions: [], roster: [] };
+  if (!state.coop.sessions) state.coop.sessions = [];
+  if (!state.coop.roster) state.coop.roster = [];
+
+  // Sessions
+  if (!state.coop.sessions.length) {
+    document.getElementById('coopSessions').innerHTML = `
+      <div class="empty-state" style="grid-column:1/-1;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+        <h3>No sessions planned</h3>
+        <p>Plan your next co-op or raid night.</p>
+      </div>`;
+  } else {
+    document.getElementById('coopSessions').innerHTML = state.coop.sessions.map(s => `
+      <div class="coop-session">
+        <div style="display:flex;justify-content:space-between;">
+          <div class="coop-game">${esc(s.game)}</div>
+          <button class="delete-btn" onclick="deleteCoopSession('${s.id}')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="coop-time">${s.date} at ${s.time || 'TBD'}</div>
+      </div>
+    `).join('');
+  }
+
+  // Roster
+  if (!state.coop.roster.length) {
+    document.getElementById('rosterList').innerHTML = '<div style="font-size:13px;color:var(--text-faint);">No squad members yet.</div>';
+  } else {
+    const roleColors = { DPS: 'var(--red)', Tank: 'var(--blue)', Healer: 'var(--green)', Support: 'var(--gold)', Flex: 'var(--accent)' };
+    document.getElementById('rosterList').innerHTML = state.coop.roster.map(m => `
+      <div class="roster-member">
+        <div class="member-avatar">${m.name.charAt(0).toUpperCase()}</div>
+        <div class="member-info">
+          <div class="member-name">${esc(m.name)}</div>
+          <div class="member-role" style="color:${roleColors[m.role] || 'var(--text-muted)'};">${m.role}</div>
+        </div>
+        <button class="delete-btn" onclick="deleteRosterMember('${m.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+    `).join('');
+  }
+}
+
+function addCoopSession() {
+  const game = document.getElementById('coopGame').value.trim();
+  if (!game) return;
+  if (!state.coop) state.coop = { sessions: [], roster: [] };
+  if (!state.coop.sessions) state.coop.sessions = [];
+  state.coop.sessions.unshift({
+    id: gid(),
+    game,
+    date: document.getElementById('coopDate').value,
+    time: document.getElementById('coopTime').value
+  });
+  save();
+  document.getElementById('coopGame').value = '';
+  renderCoop();
+}
+
+function deleteCoopSession(id) {
+  state.coop.sessions = state.coop.sessions.filter(s => s.id !== id);
+  save(); renderCoop();
+}
+
+function addRosterMember() {
+  const name = document.getElementById('rosterName').value.trim();
+  if (!name) return;
+  if (!state.coop) state.coop = { sessions: [], roster: [] };
+  if (!state.coop.roster) state.coop.roster = [];
+  state.coop.roster.push({
+    id: gid(),
+    name,
+    role: document.getElementById('rosterRole').value
+  });
+  save();
+  document.getElementById('rosterName').value = '';
+  renderCoop();
+}
+
+function deleteRosterMember(id) {
+  state.coop.roster = state.coop.roster.filter(m => m.id !== id);
+  save(); renderCoop();
+}
+
+/* ================================================================
+   SECOND SCREEN HUD
+   ================================================================ */
+function renderHud() {
+  const fields = getGameData('hud');
+  const empty = document.getElementById('hudEmpty');
+  const list = document.getElementById('hudFields');
+
+  if (!fields.length) {
+    empty.style.display = 'flex';
+    list.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = fields.map(f => `
+    <div class="hud-field">
+      <div class="hud-field-label">${esc(f.name)}</div>
+      <div class="hud-counter">
+        <button class="hud-btn" onclick="hudAdjust('${f.id}', -1)">−</button>
+        <span class="value">${f.value}</span>
+        <button class="hud-btn" onclick="hudAdjust('${f.id}', 1)">+</button>
+      </div>
+      <button class="delete-btn" onclick="deleteHudField('${f.id}')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    </div>
+  `).join('');
+}
+
+function addHudField() {
+  const name = document.getElementById('hudFieldName').value.trim();
+  if (!name) return;
+  getGameData('hud').push({
+    id: gid(),
+    name,
+    value: parseInt(document.getElementById('hudFieldValue').value) || 0
+  });
+  save();
+  document.getElementById('hudFieldName').value = '';
+  document.getElementById('hudFieldValue').value = '0';
+  renderHud();
+}
+
+function hudAdjust(id, delta) {
+  const fields = getGameData('hud');
+  const f = fields.find(x => x.id === id);
+  if (f) { f.value += delta; save(); renderHud(); }
+}
+
+function deleteHudField(id) {
+  const g = state.currentGame;
+  state.hud[g] = (state.hud[g] || []).filter(f => f.id !== id);
+  save(); renderHud();
+}
+
+/* ================================================================
+   UTILITIES
+   ================================================================ */
+function formatTime(secs) {
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const s = secs % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+}
+
+function formatDuration(secs) {
+  if (secs < 60) return secs + 's';
+  if (secs < 3600) return Math.floor(secs / 60) + 'm';
+  const h = Math.floor(secs / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  return h + 'h ' + m + 'm';
+}
+
+function esc(s) {
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+/* ================================================================
+   KEYBOARD SHORTCUTS
+   ================================================================ */
+document.addEventListener('keydown', e => {
+  // Enter on highlight input
+  if (e.key === 'Enter' && document.activeElement.id === 'highlightInput') {
+    addSessionHighlight();
+  }
+  // Enter on quest input
+  if (e.key === 'Enter' && document.activeElement.id === 'questInput') {
+    addQuest();
+  }
+  // Enter in new game modal
+  if (e.key === 'Enter' && document.activeElement.id === 'newGameTitle') {
+    addGame();
+  }
+  // Escape closes modals
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  }
+});
+
+/* ================================================================
+   INIT
+   ================================================================ */
+function init() {
+  applyTheme();
+  renderGameSelector();
+  showPanel('dashboard');
+
+  // Restore active session timer
+  if (state.activeSession) {
+    startTimerInterval();
+    updateTimerButton();
+  }
+}
+
+init();
+</script>
+</body>
+</html>

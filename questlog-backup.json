@@ -1,0 +1,50 @@
+{
+  "games": [
+    "General",
+    "Crimson Desert",
+    "God of War 2018",
+    "God of War: Ragnarok"
+  ],
+  "currentGame": "General",
+  "sessions": {},
+  "quests": {
+    "General": []
+  },
+  "choices": {
+    "General": []
+  },
+  "builds": {
+    "General": []
+  },
+  "achievements": {
+    "General": []
+  },
+  "backlog": [
+    {
+      "id": "mmsfff4zf489",
+      "title": "God of War: Ragnarok",
+      "status": "in-progress",
+      "comment": "",
+      "lastPlayed": null
+    },
+    {
+      "id": "mmsfe1ryxj23",
+      "title": "God of War 2018",
+      "status": "in-progress",
+      "comment": "Defeat the Valkyries",
+      "lastPlayed": null
+    }
+  ],
+  "mood": {
+    "General": []
+  },
+  "coop": {
+    "sessions": [],
+    "roster": []
+  },
+  "hud": {
+    "General": []
+  },
+  "activeSession": null,
+  "theme": "dark"
+}
