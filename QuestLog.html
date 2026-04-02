@@ -1,0 +1,2650 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Quest Log — Gaming Tracker</title>
+  <meta name="description" content="Your personal gaming companion: track quests, notes, materials, maps, sessions, and builds." />
+
+  <!-- Fonts -->
+  <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,700,800&f[]=satoshi@400,500,700&display=swap" rel="stylesheet" />
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    /* ─── DESIGN TOKENS ─────────────────────────────────── */
+    :root {
+      --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem;
+      --space-4: 1rem; --space-5: 1.25rem; --space-6: 1.5rem;
+      --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem;
+
+      --radius-sm: 0.375rem; --radius-md: 0.5rem;
+      --radius-lg: 0.75rem; --radius-xl: 1rem; --radius-full: 9999px;
+
+      --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+      --font-display: 'Cabinet Grotesk', 'Helvetica Neue', sans-serif;
+      --font-body: 'Satoshi', 'Inter', sans-serif;
+    }
+
+    /* ─── DARK PALETTE (game-themed: deep space + violet accent) */
+    [data-theme="dark"], :root {
+      --bg:              #0d0d12;
+      --surface:         #13131a;
+      --surface-2:       #18181f;
+      --surface-3:       #1e1e28;
+      --border:          #2a2a38;
+      --divider:         #222230;
+      --text:            #e2e0f0;
+      --text-muted:      #7a7890;
+      --text-faint:      #45435a;
+      --primary:         #7c5cfc;
+      --primary-hover:   #9578fd;
+      --primary-active:  #5c3de0;
+      --primary-glow:    rgba(124, 92, 252, 0.18);
+      --accent:          #00d4aa;
+      --accent-hover:    #00f0c0;
+      --accent-faint:    rgba(0, 212, 170, 0.12);
+      --gold:            #f5c842;
+      --gold-faint:      rgba(245, 200, 66, 0.12);
+      --danger:          #ff5c72;
+      --danger-hover:    #ff3a55;
+      --danger-faint:    rgba(255, 92, 114, 0.12);
+      --success:         #4ade80;
+      --success-faint:   rgba(74, 222, 128, 0.12);
+      --warning:         #fb923c;
+      --shadow-sm:       0 1px 3px rgba(0,0,0,0.4);
+      --shadow-md:       0 4px 16px rgba(0,0,0,0.5);
+      --shadow-lg:       0 12px 40px rgba(0,0,0,0.6);
+      --glow:            0 0 20px rgba(124, 92, 252, 0.25);
+    }
+
+    [data-theme="light"] {
+      --bg:              #f4f3ff;
+      --surface:         #ffffff;
+      --surface-2:       #f8f7ff;
+      --surface-3:       #eeeeff;
+      --border:          #dddcf5;
+      --divider:         #e8e7f8;
+      --text:            #1a1830;
+      --text-muted:      #5a5880;
+      --text-faint:      #9b99b8;
+      --primary:         #6344e8;
+      --primary-hover:   #7c5cfc;
+      --primary-active:  #4a2fd0;
+      --primary-glow:    rgba(99, 68, 232, 0.14);
+      --accent:          #009e7e;
+      --accent-hover:    #00c09a;
+      --accent-faint:    rgba(0, 158, 126, 0.1);
+      --gold:            #c8960a;
+      --gold-faint:      rgba(200, 150, 10, 0.1);
+      --danger:          #e8334a;
+      --danger-hover:    #cc2239;
+      --danger-faint:    rgba(232, 51, 74, 0.1);
+      --success:         #22a54c;
+      --success-faint:   rgba(34, 165, 76, 0.1);
+      --warning:         #d9721e;
+      --shadow-sm:       0 1px 3px rgba(100,90,200,0.08);
+      --shadow-md:       0 4px 16px rgba(100,90,200,0.12);
+      --shadow-lg:       0 12px 40px rgba(100,90,200,0.18);
+      --glow:            0 0 20px rgba(99, 68, 232, 0.15);
+    }
+
+    /* ─── BASE RESET ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html {
+      -webkit-text-size-adjust: none;
+      text-size-adjust: none;
+      -webkit-font-smoothing: antialiased;
+      scroll-behavior: smooth;
+      scroll-padding-top: 5rem;
+    }
+    body {
+      min-height: 100dvh;
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    img, picture, video, canvas, svg { display: block; max-width: 100%; height: auto; }
+    input, button, textarea, select { font: inherit; color: inherit; }
+    button { cursor: pointer; background: none; border: none; }
+    p, li { text-wrap: pretty; }
+    h1, h2, h3, h4, h5, h6 { text-wrap: balance; line-height: 1.15; font-family: var(--font-display); }
+
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 3px;
+      border-radius: var(--radius-sm);
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--radius-full); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-faint); }
+
+    /* ─── LAYOUT ─────────────────────────────────────────── */
+    .app-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    /* ─── TOPBAR ─────────────────────────────────────────── */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: var(--space-3) var(--space-4);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex-wrap: wrap;
+    }
+
+    .topbar-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      flex: 1;
+      min-width: 0;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: var(--font-display);
+      font-size: var(--text-lg);
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden; flex-shrink: 1;
+      text-overflow: ellipsis;
+    }
+
+    .logo-text span { color: var(--primary); }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    /* Game selector in topbar */
+    .game-select-wrap {
+      position: relative;
+    }
+
+    .game-select-wrap select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-8) var(--space-2) var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--text);
+      cursor: pointer;
+      min-width: 140px;
+      max-width: 180px;
+    }
+    .game-select-wrap select:focus { outline: 2px solid var(--primary); }
+    .game-select-wrap::after {
+      content: '';
+      position: absolute;
+      right: var(--space-3);
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--text-muted);
+      pointer-events: none;
+    }
+
+    /* ─── BUTTONS ─────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      text-decoration: none;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 8px var(--primary-glow);
+    }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--glow); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-muted);
+      border-color: var(--border);
+    }
+    .btn-ghost:hover { background: var(--surface-2); color: var(--text); }
+
+    .btn-danger {
+      background: var(--danger-faint);
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+
+    .btn-accent {
+      background: var(--accent-faint);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .btn-accent:hover { background: var(--accent); color: #0d0d12; }
+
+    .btn-sm {
+      padding: var(--space-1) var(--space-3);
+      font-size: var(--text-xs);
+    }
+
+    .btn-icon {
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+    .btn-icon:hover { color: var(--text); background: var(--surface-3); }
+
+    /* ─── NAV TABS ───────────────────────────────────────── */
+    .nav-tabs {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 var(--space-4);
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      color: var(--text-muted);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      transition: color var(--transition), border-color var(--transition);
+      background: none;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    .nav-tab i { font-size: 0.85em; }
+
+    /* ─── PANELS ─────────────────────────────────────────── */
+    .panels {
+      flex: 1;
+      padding: var(--space-6) var(--space-4);
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ─── SECTION HEADINGS ───────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: var(--text-lg);
+      font-weight: 800;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .section-title i {
+      color: var(--primary);
+      font-size: 0.9em;
+    }
+
+    /* ─── CARDS ──────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: var(--space-4);
+    }
+
+    .card-sm {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      margin-bottom: var(--space-3);
+    }
+
+    /* ─── FORMS ──────────────────────────────────────────── */
+    .form-group { margin-bottom: var(--space-4); }
+
+    label {
+      display: block;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: var(--space-2);
+    }
+
+    input[type="text"], input[type="number"], input[type="date"],
+    input[type="time"], input[type="url"], textarea, select.form-select {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm);
+      color: var(--text);
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    input:focus, textarea:focus, select.form-select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    input::placeholder, textarea::placeholder { color: var(--text-faint); }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    @media (max-width: 480px) { .form-row { grid-template-columns: 1fr; } }
+
+    /* ─── BADGES ─────────────────────────────────────────── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      padding: 2px var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .badge-primary { background: var(--primary-glow); color: var(--primary); }
+    .badge-accent   { background: var(--accent-faint); color: var(--accent); }
+    .badge-gold     { background: var(--gold-faint); color: var(--gold); }
+    .badge-danger   { background: var(--danger-faint); color: var(--danger); }
+    .badge-success  { background: var(--success-faint); color: var(--success); }
+    .badge-muted    { background: var(--surface-3); color: var(--text-muted); }
+
+    /* ─── ITEM ROWS ──────────────────────────────────────── */
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-2);
+      transition: border-color var(--transition), background var(--transition);
+    }
+    .item-row:hover { border-color: var(--primary); background: var(--surface-3); }
+
+    .item-main { flex: 1; min-width: 0; }
+    .item-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden; flex-shrink: 1;
+      text-overflow: ellipsis;
+    }
+    .item-sub {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden; flex-shrink: 1;
+      text-overflow: ellipsis;
+    }
+    .item-actions { display: flex; gap: var(--space-1); flex-shrink: 0; }
+
+    .item-row.completed .item-title {
+      text-decoration: line-through;
+      color: var(--text-faint);
+    }
+
+    /* Checkbox custom */
+    .check-btn {
+      width: 20px;
+      height: 20px;
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--border);
+      background: transparent;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .check-btn:hover { border-color: var(--accent); }
+    .check-btn.done {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .check-btn.done::after {
+      content: '';
+      width: 6px;
+      height: 10px;
+      border: 2px solid #0d0d12;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translate(-1px, -1px);
+    }
+
+    /* ─── EMPTY STATE ────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: var(--space-12) var(--space-8);
+      color: var(--text-muted);
+    }
+    .empty-state i {
+      font-size: 2.5rem;
+      color: var(--text-faint);
+      margin-bottom: var(--space-4);
+      display: block;
+    }
+    .empty-state p { font-size: var(--text-sm); }
+
+    /* ─── PRIORITY DOTS ──────────────────────────────────── */
+    .priority-dot {
+      width: 8px; height: 8px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+    .priority-high   { background: var(--danger); }
+    .priority-medium { background: var(--gold); }
+    .priority-low    { background: var(--success); }
+
+    /* ─── STATS ROW ──────────────────────────────────────── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      text-align: center;
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: var(--space-1);
+    }
+    .stat-label {
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ─── PROGRESS BAR ───────────────────────────────────── */
+    .progress-bar {
+      height: 6px;
+      background: var(--surface-3);
+      border-radius: var(--radius-full);
+      overflow: hidden; flex-shrink: 1;
+      margin-top: var(--space-2);
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ─── MAP PANEL ──────────────────────────────────────── */
+    .map-container {
+      border-radius: var(--radius-lg);
+      overflow: hidden; flex-shrink: 1;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      position: relative;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 400px;
+      border: none;
+      display: block;
+    }
+    @media (max-width: 500px) { .map-container iframe { height: 280px; } }
+    .map-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 300px;
+      gap: var(--space-4);
+      color: var(--text-muted);
+    }
+    .map-placeholder i { font-size: 3rem; color: var(--text-faint); }
+    .map-placeholder p { font-size: var(--text-sm); text-align: center; }
+
+    /* Map pins */
+    .pin-list { margin-top: var(--space-4); }
+    .pin-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-sm);
+      transition: background var(--transition);
+    }
+    .pin-item:hover { background: var(--surface-2); }
+    .pin-icon { font-size: 1.2rem; }
+    .pin-name { font-size: var(--text-sm); font-weight: 500; flex: 1; }
+    .pin-type { font-size: var(--text-xs); color: var(--text-muted); }
+
+    /* ─── NOTION PANEL ───────────────────────────────────── */
+    .notion-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-weight: 700;
+      font-size: var(--text-sm);
+    }
+    .notion-logo svg { width: 20px; height: 20px; }
+    .sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      font-size: var(--text-xs);
+      color: var(--text-muted);
+    }
+    .sync-dot {
+      width: 8px; height: 8px;
+      border-radius: var(--radius-full);
+      background: var(--text-faint);
+    }
+    .sync-dot.synced { background: var(--success); }
+    .sync-dot.syncing {
+      background: var(--gold);
+      animation: pulse 1s infinite;
+    }
+    .sync-dot.error { background: var(--danger); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ─── SESSION LOG ────────────────────────────────────── */
+    .session-entry {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-3);
+      padding: var(--space-4);
+      background: var(--surface-2);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      margin-bottom: var(--space-3);
+    }
+    .session-date {
+      flex-shrink: 0;
+      text-align: center;
+      background: var(--primary-glow);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      min-width: 52px;
+    }
+    .session-day { font-size: var(--text-lg); font-weight: 800; color: var(--primary); line-height: 1; }
+    .session-mon { font-size: var(--text-xs); color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; }
+    .session-body { flex: 1; min-width: 0; }
+    .session-title { font-weight: 600; font-size: var(--text-sm); }
+    .session-meta { font-size: var(--text-xs); color: var(--text-muted); margin-top: 2px; }
+    .session-notes { font-size: var(--text-xs); color: var(--text-muted); margin-top: var(--space-2); line-height: 1.5; }
+
+    /* ─── MOOD TRACKER ───────────────────────────────────── */
+    .mood-buttons {
+      display: flex;
+      gap: var(--space-2);
+      flex-wrap: wrap;
+    }
+    .mood-btn {
+      font-size: 1.5rem;
+      padding: var(--space-2);
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      border: 2px solid transparent;
+      transition: all var(--transition);
+      line-height: 1;
+    }
+    .mood-btn:hover { transform: scale(1.15); border-color: var(--primary); }
+    .mood-btn.selected { border-color: var(--primary); background: var(--primary-glow); }
+
+    /* ─── INVENTORY TABLE ────────────────────────────────── */
+    .inv-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .inv-table th {
+      text-align: left;
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: var(--space-2) var(--space-3);
+      border-bottom: 1px solid var(--border);
+    }
+    .inv-table td {
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-sm);
+      border-bottom: 1px solid var(--divider);
+      vertical-align: middle;
+    }
+    .inv-table tr:last-child td { border-bottom: none; }
+    .inv-table tr:hover td { background: var(--surface-2); }
+    .qty-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .qty-btn {
+      width: 24px; height: 24px;
+      border-radius: var(--radius-sm);
+      background: var(--surface-3);
+      border: 1px solid var(--border);
+      font-size: 1rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition);
+    }
+    .qty-btn:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .qty-num { min-width: 28px; text-align: center; font-weight: 600; }
+
+    /* ─── LOADOUT ────────────────────────────────────────── */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: var(--space-3);
+      margin-bottom: var(--space-4);
+    }
+    .slot-card {
+      background: var(--surface-2);
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      text-align: center;
+      transition: all var(--transition);
+      cursor: pointer;
+    }
+    .slot-card:hover { border-color: var(--primary); background: var(--primary-glow); }
+    .slot-card.filled { border-style: solid; border-color: var(--primary); }
+    .slot-icon { font-size: 1.6rem; margin-bottom: var(--space-2); }
+    .slot-label { font-size: var(--text-xs); color: var(--text-muted); font-weight: 500; margin-bottom: var(--space-1); text-transform: uppercase; letter-spacing: 0.04em; }
+    .slot-value { font-size: var(--text-xs); color: var(--text); font-weight: 600; }
+
+    /* ─── TIMER ──────────────────────────────────────────── */
+    .timer-display {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--primary);
+      letter-spacing: 0.05em;
+      text-align: center;
+      padding: var(--space-4) 0;
+    }
+    .timer-controls {
+      display: flex;
+      gap: var(--space-3);
+      justify-content: center;
+      margin-bottom: var(--space-5);
+    }
+
+    /* ─── QUICK NOTES STICKY ─────────────────────────────── */
+    .sticky-note {
+      background: #2a2500;
+      border: 1px solid #4a3f00;
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      position: relative;
+    }
+    [data-theme="light"] .sticky-note {
+      background: #fef9e7;
+      border-color: #f0d060;
+    }
+    .sticky-note textarea {
+      background: transparent;
+      border: none;
+      resize: none;
+      color: var(--text);
+      min-height: 100px;
+    }
+    .sticky-note textarea:focus { box-shadow: none; }
+
+    /* ─── THEME TOGGLE ───────────────────────────────────── */
+    .theme-toggle {
+      width: 36px; height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      transition: all var(--transition);
+      font-size: 1rem;
+    }
+    .theme-toggle:hover { color: var(--text); background: var(--surface-3); }
+
+    /* ─── CLEAR MODAL ────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-4);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      max-width: 400px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      transform: scale(0.95);
+      transition: transform var(--transition);
+    }
+    .modal-overlay.open .modal { transform: scale(1); }
+    .modal h3 { font-size: var(--text-lg); margin-bottom: var(--space-3); }
+    .modal p { font-size: var(--text-sm); color: var(--text-muted); margin-bottom: var(--space-6); }
+    .modal-actions { display: flex; gap: var(--space-3); justify-content: flex-end; }
+
+    /* ─── TOAST ──────────────────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      bottom: var(--space-6);
+      right: var(--space-6);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      pointer-events: none;
+    }
+    .toast {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-5);
+      font-size: var(--text-sm);
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      animation: slideUp 0.3s ease forwards;
+      pointer-events: all;
+    }
+    .toast.success { border-left: 3px solid var(--accent); }
+    .toast.error   { border-left: 3px solid var(--danger); }
+    .toast.info    { border-left: 3px solid var(--primary); }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── GAME CARDS ─────────────────────────────────────── */
+    .game-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: var(--space-4);
+    }
+    .game-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      cursor: pointer;
+      transition: all var(--transition);
+      position: relative;
+      overflow: hidden; flex-shrink: 1;
+    }
+    .game-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      opacity: 0;
+      transition: opacity var(--transition);
+    }
+    .game-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md), var(--glow); }
+    .game-card:hover::before { opacity: 1; }
+    .game-card.active-game { border-color: var(--primary); }
+    .game-card.active-game::before { opacity: 1; }
+    .game-card-emoji { font-size: 2rem; margin-bottom: var(--space-3); }
+    .game-card-name { font-weight: 700; font-size: var(--text-sm); margin-bottom: var(--space-1); }
+    .game-card-genre { font-size: var(--text-xs); color: var(--text-muted); margin-bottom: var(--space-3); }
+    .game-card-meta { display: flex; align-items: center; justify-content: space-between; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────── */
+    @media (max-width: 600px) {
+      .panels { padding: var(--space-4) var(--space-3); }
+      .topbar { padding: var(--space-2) var(--space-3); }
+      .game-grid { grid-template-columns: 1fr 1fr; }
+      .slot-grid { grid-template-columns: repeat(3, 1fr); }
+      .logo-text { font-size: var(--text-base); }
+    }
+
+    /* ─── NOTION EXPORT BOX ──────────────────────────────── */
+    .code-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-4);
+      font-family: monospace;
+      font-size: var(--text-xs);
+      color: var(--accent);
+      white-space: pre-wrap;
+      max-height: 240px;
+      overflow-y: auto;
+      word-break: break-all;
+    }
+
+    /* ─── DIVIDER ─────────────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--divider);
+      margin: var(--space-5) 0;
+    }
+
+    /* Typing cursor on timer */
+    .blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+    /* Filter row */
+    .filter-row {
+      display: flex;
+      gap: var(--space-2);
+      margin-bottom: var(--space-4);
+      flex-wrap: wrap;
+    }
+    .filter-btn {
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all var(--transition);
+    }
+    .filter-btn:hover { color: var(--text); background: var(--surface-3); }
+    .filter-btn.active { background: var(--primary-glow); color: var(--primary); border-color: var(--primary); }
+  </style>
+</head>
+<body>
+
+<!-- ─── CLEAR DATA MODAL ─────────────────────────────────── -->
+<div class="modal-overlay" id="clearModal">
+  <div class="modal">
+    <h3>⚠️ Clear All Data?</h3>
+    <p>This will permanently erase everything — all games, quests, notes, materials, sessions, and builds. This cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeClearModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmClear()"><i class="fa-solid fa-trash"></i> Clear Everything</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── TOAST CONTAINER ──────────────────────────────────── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ─── APP ──────────────────────────────────────────────── -->
+<div class="app-wrapper">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <!-- SVG Logo -->
+      <svg class="logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Quest Log logo">
+        <rect width="36" height="36" rx="8" fill="var(--primary)" opacity="0.15"/>
+        <!-- Controller body -->
+        <path d="M6 15 Q6 11 10 11 L26 11 Q30 11 30 15 L29 23 Q28.5 26 25.5 26 Q23 26 22 24 L21 22 H15 L14 24 Q13 26 10.5 26 Q7.5 26 7 23 Z" fill="var(--primary)" opacity="0.9"/>
+        <!-- D-pad vertical -->
+        <rect x="11" y="15" width="2.5" height="7" rx="1" fill="var(--bg)" opacity="0.9"/>
+        <!-- D-pad horizontal -->
+        <rect x="9" y="17" width="6.5" height="2.5" rx="1" fill="var(--bg)" opacity="0.9"/>
+        <!-- Right buttons -->
+        <circle cx="24" cy="16.5" r="1.5" fill="var(--accent)" opacity="0.9"/>
+        <circle cx="27" cy="19" r="1.5" fill="var(--accent)" opacity="0.9"/>
+        <circle cx="24" cy="21.5" r="1.5" fill="var(--accent)" opacity="0.9"/>
+        <circle cx="21" cy="19" r="1.5" fill="var(--accent)" opacity="0.9"/>
+      </svg>
+      <span class="logo-text">Quest<span>Log</span></span>
+    </div>
+
+    <div class="topbar-actions">
+      <!-- Game selector -->
+      <div class="game-select-wrap">
+        <select id="activeGameSelect" onchange="setActiveGame(this.value)">
+          <option value="">No Game Selected</option>
+        </select>
+      </div>
+
+      <!-- Theme toggle -->
+      <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle light/dark">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+      </button>
+
+      <!-- Clear data button -->
+      <button class="btn btn-danger btn-sm" onclick="openClearModal()">
+        <i class="fa-solid fa-trash"></i>
+        <span>Clear</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- NAV TABS -->
+  <nav class="nav-tabs" role="tablist">
+    <button class="nav-tab active" onclick="showTab('dashboard')" data-tab="dashboard">
+      <i class="fa-solid fa-gauge"></i> Dashboard
+    </button>
+    <button class="nav-tab" onclick="showTab('games')" data-tab="games">
+      <i class="fa-solid fa-gamepad"></i> Games
+    </button>
+    <button class="nav-tab" onclick="showTab('quests')" data-tab="quests">
+      <i class="fa-solid fa-scroll"></i> Quests
+    </button>
+    <button class="nav-tab" onclick="showTab('notes')" data-tab="notes">
+      <i class="fa-solid fa-note-sticky"></i> Notes
+    </button>
+    <button class="nav-tab" onclick="showTab('materials')" data-tab="materials">
+      <i class="fa-solid fa-boxes-stacked"></i> Materials
+    </button>
+    <button class="nav-tab" onclick="showTab('map')" data-tab="map">
+      <i class="fa-solid fa-map"></i> Map
+    </button>
+    <button class="nav-tab" onclick="showTab('session')" data-tab="session">
+      <i class="fa-solid fa-clock"></i> Session
+    </button>
+    <button class="nav-tab" onclick="showTab('build')" data-tab="build">
+      <i class="fa-solid fa-shield-halved"></i> Build
+    </button>
+    <button class="nav-tab" onclick="showTab('notion')" data-tab="notion">
+      <i class="fa-solid fa-upload"></i> Notion
+    </button>
+  </nav>
+
+  <!-- PANELS -->
+  <main class="panels">
+
+    <!-- ═══════════════════════════════════════════════════
+         DASHBOARD
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel active" id="panel-dashboard">
+      <div class="section-header">
+        <h1 class="section-title"><i class="fa-solid fa-gauge"></i> Dashboard</h1>
+        <span id="dashGameName" class="badge badge-primary">No game active</span>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row" id="dashStats">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-sessions">0</div>
+          <div class="stat-label">Sessions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-hours">0h</div>
+          <div class="stat-label">Played</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-quests">0</div>
+          <div class="stat-label">Quests</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-items">0</div>
+          <div class="stat-label">Materials</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-notes">0</div>
+          <div class="stat-label">Notes</div>
+        </div>
+      </div>
+
+      <!-- Quest progress -->
+      <div class="card" id="questProgressCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-3)">
+          <strong style="font-size:var(--text-sm)">Quest Completion</strong>
+          <span id="questPct" class="badge badge-accent">0%</span>
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="questProgressBar" style="width:0%"></div></div>
+      </div>
+
+      <!-- Recent activity -->
+      <div class="card">
+        <strong style="font-size:var(--text-sm);margin-bottom:var(--space-4);display:block">Recent Activity</strong>
+        <div id="recentActivity">
+          <div class="empty-state">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <p>Your recent activity will appear here once you start logging sessions and quests.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick sticky note -->
+      <div class="card">
+        <strong style="font-size:var(--text-sm);margin-bottom:var(--space-3);display:flex;align-items:center;gap:var(--space-2)">
+          <i class="fa-solid fa-bolt" style="color:var(--gold)"></i> Quick Note
+        </strong>
+        <div class="sticky-note">
+          <textarea id="quickNoteArea" placeholder="Jot something down fast — spawn location, item to craft, tip from a friend..." oninput="saveQuickNote()"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         GAMES LIBRARY
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-games">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-gamepad"></i> Game Library</h2>
+        <button class="btn btn-primary btn-sm" onclick="openAddGame()">
+          <i class="fa-solid fa-plus"></i> Add Game
+        </button>
+      </div>
+
+      <div id="gameGrid" class="game-grid"></div>
+
+      <!-- Add Game Form -->
+      <div class="card" id="addGameForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">Add New Game</h3>
+        <div class="form-group">
+          <label>Game Name</label>
+          <input type="text" id="newGameName" placeholder="e.g. Elden Ring, Crimson Desert..." />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Genre</label>
+            <input type="text" id="newGameGenre" placeholder="MMORPG, Action RPG..." />
+          </div>
+          <div class="form-group">
+            <label>Platform</label>
+            <input type="text" id="newGamePlatform" placeholder="PS5, PC..." />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-select" id="newGameStatus">
+              <option value="playing">Playing</option>
+              <option value="backlog">Backlog</option>
+              <option value="completed">Completed</option>
+              <option value="on-hold">On Hold</option>
+              <option value="dropped">Dropped</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Emoji Icon</label>
+            <input type="text" id="newGameEmoji" placeholder="🎮 🗡️ 🔥 🌌" maxlength="4" />
+          </div>
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addGame()"><i class="fa-solid fa-plus"></i> Add Game</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('addGameForm').style.display='none'">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         QUESTS
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-quests">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-scroll"></i> Quests & Objectives</h2>
+        <button class="btn btn-primary btn-sm" onclick="openQuestForm()">
+          <i class="fa-solid fa-plus"></i> Add Quest
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterQuests('all',this)">All</button>
+        <button class="filter-btn" onclick="filterQuests('main',this)">Main</button>
+        <button class="filter-btn" onclick="filterQuests('side',this)">Side</button>
+        <button class="filter-btn" onclick="filterQuests('daily',this)">Daily</button>
+        <button class="filter-btn" onclick="filterQuests('active',this)">Active</button>
+        <button class="filter-btn" onclick="filterQuests('done',this)">Done</button>
+      </div>
+
+      <!-- Add Quest Form -->
+      <div class="card" id="questForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">New Quest</h3>
+        <div class="form-group">
+          <label>Quest Name</label>
+          <input type="text" id="questName" placeholder="e.g. Find the Ancient Relic..." />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Type</label>
+            <select class="form-select" id="questType">
+              <option value="main">Main Quest</option>
+              <option value="side">Side Quest</option>
+              <option value="daily">Daily</option>
+              <option value="collection">Collection</option>
+              <option value="boss">Boss Fight</option>
+              <option value="crafting">Crafting</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Priority</label>
+            <select class="form-select" id="questPriority">
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes / Steps</label>
+          <textarea id="questNotes" placeholder="Steps, requirements, locations, tips..."></textarea>
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addQuest()"><i class="fa-solid fa-plus"></i> Add Quest</button>
+          <button class="btn btn-ghost" onclick="closeQuestForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div id="questList"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         NOTES
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-notes">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-note-sticky"></i> Notes</h2>
+        <button class="btn btn-primary btn-sm" onclick="openNoteForm()">
+          <i class="fa-solid fa-plus"></i> New Note
+        </button>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterNotes('all',this)">All</button>
+        <button class="filter-btn" onclick="filterNotes('tip',this)">Tips</button>
+        <button class="filter-btn" onclick="filterNotes('lore',this)">Lore</button>
+        <button class="filter-btn" onclick="filterNotes('location',this)">Locations</button>
+        <button class="filter-btn" onclick="filterNotes('npc',this)">NPCs</button>
+        <button class="filter-btn" onclick="filterNotes('boss',this)">Bosses</button>
+      </div>
+
+      <!-- Add Note Form -->
+      <div class="card" id="noteForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">New Note</h3>
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" id="noteTitle" placeholder="e.g. How to defeat the Lich King..." />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select class="form-select" id="noteCategory">
+            <option value="tip">Tip / Strategy</option>
+            <option value="lore">Lore</option>
+            <option value="location">Location</option>
+            <option value="npc">NPC Info</option>
+            <option value="boss">Boss Guide</option>
+            <option value="build">Build Note</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Content</label>
+          <textarea id="noteContent" placeholder="Write your note here..." style="min-height:120px;"></textarea>
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addNote()"><i class="fa-solid fa-plus"></i> Save Note</button>
+          <button class="btn btn-ghost" onclick="closeNoteForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div id="noteList"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         MATERIALS / INVENTORY
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-materials">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Materials & Inventory</h2>
+        <button class="btn btn-primary btn-sm" onclick="openMaterialForm()">
+          <i class="fa-solid fa-plus"></i> Add Item
+        </button>
+      </div>
+
+      <!-- Filter -->
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="filterMaterials('all',this)">All</button>
+        <button class="filter-btn" onclick="filterMaterials('material',this)">Materials</button>
+        <button class="filter-btn" onclick="filterMaterials('weapon',this)">Weapons</button>
+        <button class="filter-btn" onclick="filterMaterials('armor',this)">Armor</button>
+        <button class="filter-btn" onclick="filterMaterials('consumable',this)">Consumables</button>
+        <button class="filter-btn" onclick="filterMaterials('quest-item',this)">Quest Items</button>
+      </div>
+
+      <!-- Add Material Form -->
+      <div class="card" id="materialForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">Add Item</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Item Name</label>
+            <input type="text" id="matName" placeholder="Dragon Scale, Iron Ore..." />
+          </div>
+          <div class="form-group">
+            <label>Emoji</label>
+            <input type="text" id="matEmoji" placeholder="⚔️ 🛡️ 💎" maxlength="4" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select class="form-select" id="matCategory">
+              <option value="material">Material</option>
+              <option value="weapon">Weapon</option>
+              <option value="armor">Armor</option>
+              <option value="consumable">Consumable</option>
+              <option value="quest-item">Quest Item</option>
+              <option value="misc">Misc</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Quantity</label>
+            <input type="number" id="matQty" placeholder="1" min="0" value="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input type="text" id="matNotes" placeholder="Where to find it, what it's used for..." />
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addMaterial()"><i class="fa-solid fa-plus"></i> Add Item</button>
+          <button class="btn btn-ghost" onclick="closeMaterialForm()">Cancel</button>
+        </div>
+      </div>
+
+      <!-- Inventory Table -->
+      <div class="card" style="overflow-x:auto;padding:0">
+        <table class="inv-table" id="materialTable">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Item</th>
+              <th>Category</th>
+              <th>Qty</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="materialBody"></tbody>
+        </table>
+        <div id="materialEmpty" class="empty-state" style="display:none">
+          <i class="fa-solid fa-box-open"></i>
+          <p>No items in inventory yet. Add materials, weapons, armor, and more.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         MAP
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-map">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-map"></i> Map</h2>
+      </div>
+
+      <!-- Embed URL Input -->
+      <div class="card">
+        <div class="section-header" style="margin-bottom:var(--space-3)">
+          <strong style="font-size:var(--text-sm)">Map Embed</strong>
+          <div style="display:flex;gap:var(--space-2)">
+            <button class="btn btn-primary btn-sm" onclick="loadMapEmbed()"><i class="fa-solid fa-play"></i> Load</button>
+            <button class="btn btn-ghost btn-sm" onclick="clearMap()">Clear</button>
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:var(--space-2)">
+          <label>Embed URL or iframe src</label>
+          <input type="url" id="mapUrl" placeholder="Paste an embed URL — e.g. https://www.mapgenie.io/... or any iframe src" />
+        </div>
+        <p style="font-size:var(--text-xs);color:var(--text-muted)">
+          Works with <strong style="color:var(--accent)">MapGenie</strong>, <strong style="color:var(--accent)">Fextralife</strong>, <strong style="color:var(--accent)">Google Maps</strong>, wiki map pages, and any embeddable URL. Some game wikis use direct map links — paste the share embed URL here.
+        </p>
+      </div>
+
+      <!-- Map render area -->
+      <div class="map-container" id="mapRenderArea">
+        <div class="map-placeholder" id="mapPlaceholder">
+          <i class="fa-solid fa-map-pin"></i>
+          <p>Paste an embed URL above and hit Load to display your game map here.</p>
+        </div>
+      </div>
+
+      <!-- Map pins / locations -->
+      <div class="card" style="margin-top:var(--space-4)">
+        <div class="section-header" style="margin-bottom:var(--space-4)">
+          <strong style="font-size:var(--text-sm)">Saved Locations</strong>
+          <button class="btn btn-ghost btn-sm" onclick="openPinForm()"><i class="fa-solid fa-plus"></i> Add Pin</button>
+        </div>
+
+        <div class="card-sm" id="pinForm" style="display:none">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Location Name</label>
+              <input type="text" id="pinName" placeholder="e.g. Boss Spawn, Secret Chest..." />
+            </div>
+            <div class="form-group">
+              <label>Type</label>
+              <select class="form-select" id="pinType">
+                <option value="boss">👹 Boss</option>
+                <option value="chest">📦 Chest</option>
+                <option value="npc">👤 NPC</option>
+                <option value="waypoint">📍 Waypoint</option>
+                <option value="dungeon">🏚️ Dungeon</option>
+                <option value="resource">⛏️ Resource Node</option>
+                <option value="vendor">🛒 Vendor</option>
+                <option value="custom">⭐ Custom</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Coordinates / Notes</label>
+            <input type="text" id="pinCoords" placeholder="X: 420, Y: 215 — or any description..." />
+          </div>
+          <div style="display:flex;gap:var(--space-3)">
+            <button class="btn btn-primary btn-sm" onclick="addPin()"><i class="fa-solid fa-map-pin"></i> Save Pin</button>
+            <button class="btn btn-ghost btn-sm" onclick="closePinForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div class="pin-list" id="pinList"></div>
+        <div id="pinEmpty" class="empty-state" style="display:none;padding:var(--space-8)">
+          <i class="fa-solid fa-location-dot"></i>
+          <p>No saved locations yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         SESSION LOG
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-session">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-clock"></i> Session Log</h2>
+        <button class="btn btn-primary btn-sm" onclick="openSessionForm()">
+          <i class="fa-solid fa-plus"></i> Log Session
+        </button>
+      </div>
+
+      <!-- Live Session Timer -->
+      <div class="card" style="text-align:center">
+        <strong style="font-size:var(--text-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em">Live Session Timer</strong>
+        <div class="timer-display" id="timerDisplay">00:00:00</div>
+        <div class="timer-controls">
+          <button class="btn btn-accent" id="timerStartBtn" onclick="startTimer()"><i class="fa-solid fa-play"></i> Start</button>
+          <button class="btn btn-ghost" id="timerPauseBtn" onclick="pauseTimer()" style="display:none"><i class="fa-solid fa-pause"></i> Pause</button>
+          <button class="btn btn-ghost" id="timerStopBtn" onclick="stopTimerAndLog()" style="display:none"><i class="fa-solid fa-stop"></i> End & Log</button>
+          <button class="btn btn-ghost btn-sm" id="timerResetBtn" onclick="resetTimer()" style="display:none"><i class="fa-solid fa-rotate-left"></i></button>
+        </div>
+      </div>
+
+      <!-- Mood for session -->
+      <div class="card">
+        <strong style="font-size:var(--text-sm);margin-bottom:var(--space-3);display:block">Session Mood</strong>
+        <div class="mood-buttons" id="moodButtons">
+          <button class="mood-btn" onclick="setMood('😤','Frustrated')" title="Frustrated">😤</button>
+          <button class="mood-btn" onclick="setMood('😕','Meh')" title="Meh">😕</button>
+          <button class="mood-btn" onclick="setMood('🙂','Good')" title="Good">🙂</button>
+          <button class="mood-btn" onclick="setMood('😄','Great')" title="Great">😄</button>
+          <button class="mood-btn" onclick="setMood('🔥','On Fire')" title="On Fire">🔥</button>
+          <button class="mood-btn" onclick="setMood('💀','Raging')" title="Raging">💀</button>
+          <button class="mood-btn" onclick="setMood('🏆','Victory')" title="Victory">🏆</button>
+          <button class="mood-btn" onclick="setMood('😴','Tired')" title="Tired">😴</button>
+        </div>
+        <div id="currentMood" style="margin-top:var(--space-3);font-size:var(--text-xs);color:var(--text-muted)"></div>
+      </div>
+
+      <!-- Manual session form -->
+      <div class="card" id="sessionForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">Log Session</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" id="sessionDate" />
+          </div>
+          <div class="form-group">
+            <label>Duration (minutes)</label>
+            <input type="number" id="sessionDuration" placeholder="90" min="1" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>What did you do?</label>
+          <textarea id="sessionSummary" placeholder="Completed main quest chapter 3, farmed dragon scales, reached level 45..."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Mood</label>
+          <select class="form-select" id="sessionMood">
+            <option value="🔥 On Fire">🔥 On Fire</option>
+            <option value="😄 Great">😄 Great</option>
+            <option value="🙂 Good">🙂 Good</option>
+            <option value="😕 Meh">😕 Meh</option>
+            <option value="😤 Frustrated">😤 Frustrated</option>
+            <option value="💀 Raging">💀 Raging</option>
+            <option value="🏆 Victory">🏆 Victory</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addSession()"><i class="fa-solid fa-save"></i> Save Session</button>
+          <button class="btn btn-ghost" onclick="closeSessionForm()">Cancel</button>
+        </div>
+      </div>
+
+      <div id="sessionList"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         BUILD / LOADOUT
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-build">
+      <div class="section-header">
+        <h2 class="section-title"><i class="fa-solid fa-shield-halved"></i> Build & Loadout</h2>
+        <button class="btn btn-primary btn-sm" onclick="openBuildForm()">
+          <i class="fa-solid fa-plus"></i> New Build
+        </button>
+      </div>
+
+      <!-- Build list -->
+      <div id="buildList"></div>
+
+      <!-- Add Build Form -->
+      <div class="card" id="buildForm" style="display:none">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">New Build / Loadout</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Build Name</label>
+            <input type="text" id="buildName" placeholder="e.g. Tank Build, Speed Farmer..." />
+          </div>
+          <div class="form-group">
+            <label>Class / Type</label>
+            <input type="text" id="buildClass" placeholder="Warrior, Mage, Ranger..." />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Weapon</label>
+            <input type="text" id="buildWeapon" placeholder="Greatsword of Chaos..." />
+          </div>
+          <div class="form-group">
+            <label>Armor</label>
+            <input type="text" id="buildArmor" placeholder="Dragon Scale Set..." />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Skills / Abilities</label>
+            <input type="text" id="buildSkills" placeholder="Fireball, Shield Bash, Dash..." />
+          </div>
+          <div class="form-group">
+            <label>Stats Focus</label>
+            <input type="text" id="buildStats" placeholder="STR 40, DEX 20, VIT 30..." />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Strategy / Notes</label>
+          <textarea id="buildNotes" placeholder="How to play this build, what it counters, tips..."></textarea>
+        </div>
+        <div style="display:flex;gap:var(--space-3)">
+          <button class="btn btn-primary" onclick="addBuild()"><i class="fa-solid fa-plus"></i> Save Build</button>
+          <button class="btn btn-ghost" onclick="closeBuildForm()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════
+         NOTION SYNC
+    ══════════════════════════════════════════════════════ -->
+    <section class="panel" id="panel-notion">
+      <div class="section-header">
+        <h2 class="section-title">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;color:var(--primary)" aria-hidden="true">
+            <path d="M6.085 8.648C8.3 10.44 9.2 10.286 13.25 9.99l71.44-4.285c.9 0 .15-.9-.3-1.05L72.04.148c-2.1-.6-4.95-.9-7.5-.9L6.985 3.698c-2.25.15-4.65 1.2-3.75 4.95z" fill="currentColor"/>
+            <path d="M9.985 22.198v67.8c0 3.6 1.8 4.95 5.85 4.65l78.6-4.5c4.05-.3 4.5-3 4.5-6.15V16.048c0-3-1.2-4.65-3.9-4.35l-81 4.65c-3 .15-4.05 1.8-4.05 5.85z" fill="var(--surface)"/>
+            <path d="M71.5 21.598l-21.75 1.35c-3 .15-3.75 1.95-3.75 4.05v30.45c0 1.8.75 3.75 3.9 3.45l22.65-1.35c3-.15 3.75-1.95 3.75-4.2V25.798c0-2.85-1.05-4.5-4.8-4.2z" fill="currentColor" opacity="0.3"/>
+            <path d="M20.485 31.198l.6 42.9 9.6-.6-.3-17.55 15.6-1.05-.15 16.8 9.45-.6-.3-44.85-9.15.6.15 19.05-15.75 1.05V31.648l-9.75.55z" fill="currentColor"/>
+          </svg>
+          Notion Sync
+        </h2>
+        <div class="sync-status">
+          <div class="sync-dot" id="syncDot"></div>
+          <span id="syncStatus">Not synced</span>
+        </div>
+      </div>
+
+      <!-- API Setup -->
+      <div class="card">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-4)">Notion API Configuration</h3>
+        <div class="form-group">
+          <label>Integration Token (Secret)</label>
+          <input type="password" id="notionToken" placeholder="secret_xxxxxxxxxxxx" oninput="saveNotionConfig()" />
+        </div>
+        <div class="form-group">
+          <label>Database ID (for syncing entries)</label>
+          <input type="text" id="notionDbId" placeholder="32-character database ID from your Notion URL" oninput="saveNotionConfig()" />
+        </div>
+        <div style="background:var(--accent-faint);border:1px solid var(--accent);border-radius:var(--radius-md);padding:var(--space-4);margin-bottom:var(--space-4)">
+          <p style="font-size:var(--text-xs);color:var(--text-muted);line-height:1.7">
+            <strong style="color:var(--accent)">How to set up:</strong><br>
+            1. Go to <strong>notion.so/my-integrations</strong> → create an integration → copy the secret token.<br>
+            2. Open your Notion database → click <strong>···</strong> → Add connections → select your integration.<br>
+            3. Copy the database ID from the URL (the part between the last <code style="color:var(--gold)">/</code> and <code style="color:var(--gold)">?</code>).<br>
+            4. Paste both above and click <strong>Sync to Notion</strong> below.
+          </p>
+        </div>
+        <button class="btn btn-primary" onclick="syncToNotion()">
+          <i class="fa-solid fa-rotate"></i> Sync All Data to Notion
+        </button>
+      </div>
+
+      <!-- Export JSON (manual backup) -->
+      <div class="card">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-3)">Export / Backup</h3>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-4)">Download your data as JSON, or copy it to paste directly into Notion as a code block.</p>
+        <div style="display:flex;gap:var(--space-3);margin-bottom:var(--space-4);flex-wrap:wrap">
+          <button class="btn btn-accent btn-sm" onclick="exportJSON()"><i class="fa-solid fa-download"></i> Download JSON</button>
+          <button class="btn btn-ghost btn-sm" onclick="copyExport()"><i class="fa-regular fa-copy"></i> Copy to Clipboard</button>
+          <button class="btn btn-ghost btn-sm" onclick="importJSON()"><i class="fa-solid fa-upload"></i> Import JSON</button>
+        </div>
+        <div class="code-box" id="exportPreview">{ /* Your exported data will appear here */ }</div>
+        <input type="file" id="importFile" accept=".json" style="display:none" onchange="loadImportFile(event)" />
+      </div>
+
+      <!-- Notion page export text -->
+      <div class="card">
+        <h3 style="font-size:var(--text-sm);font-weight:700;margin-bottom:var(--space-3)">Notion Page Export</h3>
+        <p style="font-size:var(--text-xs);color:var(--text-muted);margin-bottom:var(--space-4)">Copy this formatted text and paste it directly into a Notion page.</p>
+        <button class="btn btn-ghost btn-sm" onclick="generateNotionPage()" style="margin-bottom:var(--space-3)">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Notion Page
+        </button>
+        <div class="code-box" id="notionPagePreview" style="color:var(--text-muted)">Click "Generate Notion Page" to create formatted content.</div>
+        <button class="btn btn-ghost btn-sm" style="margin-top:var(--space-3)" onclick="copyNotionPage()">
+          <i class="fa-regular fa-copy"></i> Copy Notion Content
+        </button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// STATE & STORAGE
+// ═══════════════════════════════════════════════════════════
+const STORAGE_KEY = 'questlog_v2';
+
+function defaultState() {
+  return {
+    games: [],
+    activeGameId: null,
+    quickNote: '',
+    notionToken: '',
+    notionDbId: '',
+    mapUrl: '',
+    pins: {},        // gameId -> []
+    quests: {},      // gameId -> []
+    notes: {},       // gameId -> []
+    materials: {},   // gameId -> []
+    sessions: {},    // gameId -> []
+    builds: {},      // gameId -> []
+    currentMood: null,
+    theme: 'dark'
+  };
+}
+
+let state = defaultState();
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(defaultState(), parsed);
+    }
+  } catch(e) { console.warn('State load error', e); }
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+  catch(e) { console.warn('Save error', e); }
+}
+
+function getGameData(key) {
+  if (!state.activeGameId) return [];
+  if (!state[key][state.activeGameId]) state[key][state.activeGameId] = [];
+  return state[key][state.activeGameId];
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+// ═══════════════════════════════════════════════════════════
+// THEME
+// ═══════════════════════════════════════════════════════════
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  const icon = document.getElementById('themeIcon');
+  if (icon) icon.className = t === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+}
+function toggleTheme() {
+  state.theme = state.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(state.theme);
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TABS
+// ═══════════════════════════════════════════════════════════
+function showTab(tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+  document.getElementById(`panel-${tab}`).classList.add('active');
+  if (tab === 'notion') refreshExportPreview();
+}
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+function toast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: 'fa-check-circle', error: 'fa-circle-exclamation', info: 'fa-circle-info' };
+  t.innerHTML = `<i class="fa-solid ${icons[type] || 'fa-circle-info'}" style="color:var(--${type==='success'?'accent':type==='error'?'danger':'primary'})"></i> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ═══════════════════════════════════════════════════════════
+// CLEAR DATA
+// ═══════════════════════════════════════════════════════════
+function openClearModal() { document.getElementById('clearModal').classList.add('open'); }
+function closeClearModal() { document.getElementById('clearModal').classList.remove('open'); }
+function confirmClear() {
+  const t = state.theme;
+  localStorage.removeItem(STORAGE_KEY);
+  state = defaultState();
+  state.theme = t;
+  saveState();
+  closeClearModal();
+  renderAll();
+  toast('All data cleared.', 'info');
+}
+
+// ═══════════════════════════════════════════════════════════
+// GAMES
+// ═══════════════════════════════════════════════════════════
+const STATUS_COLOR = {
+  playing: 'accent', backlog: 'muted', completed: 'success', 'on-hold': 'gold', dropped: 'danger'
+};
+
+function openAddGame() {
+  document.getElementById('addGameForm').style.display = 'block';
+  document.getElementById('newGameName').focus();
+}
+
+function addGame() {
+  const name = document.getElementById('newGameName').value.trim();
+  if (!name) { toast('Game name required.', 'error'); return; }
+  const game = {
+    id: uid(),
+    name,
+    genre: document.getElementById('newGameGenre').value.trim(),
+    platform: document.getElementById('newGamePlatform').value.trim(),
+    status: document.getElementById('newGameStatus').value,
+    emoji: document.getElementById('newGameEmoji').value.trim() || '🎮',
+    createdAt: new Date().toISOString()
+  };
+  state.games.push(game);
+  if (!state.activeGameId) { state.activeGameId = game.id; }
+  saveState();
+  document.getElementById('addGameForm').style.display = 'none';
+  ['newGameName','newGameGenre','newGamePlatform','newGameEmoji'].forEach(id => document.getElementById(id).value = '');
+  renderGames();
+  renderActiveGameSelect();
+  renderDashboard();
+  toast(`"${game.name}" added!`);
+}
+
+function removeGame(id) {
+  if (!confirm('Remove this game and all its data?')) return;
+  state.games = state.games.filter(g => g.id !== id);
+  if (state.activeGameId === id) state.activeGameId = state.games[0]?.id || null;
+  saveState();
+  renderGames();
+  renderActiveGameSelect();
+  renderDashboard();
+}
+
+function setActiveGame(id) {
+  state.activeGameId = id || null;
+  saveState();
+  renderActiveGameSelect();
+  renderDashboard();
+  renderQuests();
+  renderNotes();
+  renderMaterials();
+  renderSessions();
+  renderBuilds();
+  renderPins();
+}
+
+function renderActiveGameSelect() {
+  const sel = document.getElementById('activeGameSelect');
+  sel.innerHTML = '<option value="">No Game Selected</option>';
+  state.games.forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g.id;
+    opt.textContent = `${g.emoji} ${g.name}`;
+    if (g.id === state.activeGameId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+function renderGames() {
+  const grid = document.getElementById('gameGrid');
+  if (!state.games.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><i class="fa-solid fa-gamepad"></i><p>No games added yet. Add your first game to get started.</p></div>`;
+    return;
+  }
+  grid.innerHTML = state.games.map(g => {
+    const sessions = (state.sessions[g.id] || []).length;
+    const totalMins = (state.sessions[g.id] || []).reduce((a, s) => a + (parseInt(s.duration) || 0), 0);
+    const hrs = Math.round(totalMins / 60 * 10) / 10;
+    return `
+    <div class="game-card ${g.id === state.activeGameId ? 'active-game' : ''}" onclick="setActiveGame('${g.id}'); document.getElementById('activeGameSelect').value='${g.id}'">
+      <div class="game-card-emoji">${g.emoji}</div>
+      <div class="game-card-name">${g.name}</div>
+      <div class="game-card-genre">${g.genre || 'Unknown Genre'} · ${g.platform || 'Any'}</div>
+      <div class="game-card-meta">
+        <span class="badge badge-${STATUS_COLOR[g.status] || 'muted'}">${g.status}</span>
+        <span style="font-size:var(--text-xs);color:var(--text-muted)">${hrs}h played</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" style="margin-top:var(--space-3);width:100%" onclick="event.stopPropagation();removeGame('${g.id}')"><i class="fa-regular fa-trash-can"></i> Remove</button>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════════════════════════
+function renderDashboard() {
+  const id = state.activeGameId;
+  const game = state.games.find(g => g.id === id);
+  document.getElementById('dashGameName').textContent = game ? `${game.emoji} ${game.name}` : 'No game active';
+
+  const sessions = id ? (state.sessions[id] || []) : [];
+  const quests = id ? (state.quests[id] || []) : [];
+  const mats = id ? (state.materials[id] || []) : [];
+  const notes = id ? (state.notes[id] || []) : [];
+
+  const totalMins = sessions.reduce((a, s) => a + (parseInt(s.duration) || 0), 0);
+  const hrs = (totalMins / 60).toFixed(1);
+
+  document.getElementById('stat-sessions').textContent = sessions.length;
+  document.getElementById('stat-hours').textContent = hrs + 'h';
+  document.getElementById('stat-quests').textContent = quests.length;
+  document.getElementById('stat-items').textContent = mats.length;
+  document.getElementById('stat-notes').textContent = notes.length;
+
+  const done = quests.filter(q => q.done).length;
+  const pct = quests.length ? Math.round(done / quests.length * 100) : 0;
+  document.getElementById('questPct').textContent = pct + '%';
+  document.getElementById('questProgressBar').style.width = pct + '%';
+
+  // Recent activity
+  const activity = document.getElementById('recentActivity');
+  const recent = [
+    ...sessions.slice(-3).map(s => ({ type: 'session', label: `Session: ${s.summary || 'No summary'}`, date: s.date, icon: 'fa-clock', color: 'accent' })),
+    ...quests.filter(q => q.done).slice(-2).map(q => ({ type: 'quest', label: `Completed: ${q.name}`, date: q.completedAt || '', icon: 'fa-check', color: 'success' }))
+  ].sort((a, b) => (b.date > a.date ? 1 : -1)).slice(0, 5);
+
+  if (!recent.length) {
+    activity.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock-rotate-left"></i><p>No recent activity yet.</p></div>`;
+  } else {
+    activity.innerHTML = recent.map(r => `
+      <div class="item-row" style="margin-bottom:var(--space-2)">
+        <i class="fa-solid ${r.icon}" style="color:var(--${r.color});font-size:0.85rem;flex-shrink:0"></i>
+        <div class="item-main">
+          <div class="item-title">${r.label}</div>
+          <div class="item-sub">${r.date || 'Unknown date'}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUESTS
+// ═══════════════════════════════════════════════════════════
+let questFilter = 'all';
+const QUEST_ICONS = { main:'fa-star', side:'fa-diamond', daily:'fa-rotate', collection:'fa-layer-group', boss:'fa-skull', crafting:'fa-hammer' };
+const QUEST_COLORS = { main:'gold', side:'primary', daily:'accent', collection:'primary', boss:'danger', crafting:'warning' };
+
+function openQuestForm() {
+  document.getElementById('questForm').style.display = 'block';
+  document.getElementById('questName').focus();
+}
+function closeQuestForm() { document.getElementById('questForm').style.display = 'none'; }
+
+function addQuest() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const name = document.getElementById('questName').value.trim();
+  if (!name) { toast('Quest name required.', 'error'); return; }
+  const quest = {
+    id: uid(),
+    name,
+    type: document.getElementById('questType').value,
+    priority: document.getElementById('questPriority').value,
+    notes: document.getElementById('questNotes').value.trim(),
+    done: false,
+    createdAt: new Date().toISOString()
+  };
+  if (!state.quests[state.activeGameId]) state.quests[state.activeGameId] = [];
+  state.quests[state.activeGameId].unshift(quest);
+  saveState();
+  closeQuestForm();
+  ['questName','questNotes'].forEach(id => document.getElementById(id).value = '');
+  renderQuests();
+  renderDashboard();
+  toast(`Quest "${name}" added!`);
+}
+
+function toggleQuest(id) {
+  const quests = getGameData('quests');
+  const q = quests.find(q => q.id === id);
+  if (q) {
+    q.done = !q.done;
+    if (q.done) q.completedAt = new Date().toISOString().split('T')[0];
+  }
+  saveState(); renderQuests(); renderDashboard();
+}
+
+function deleteQuest(id) {
+  if (!state.activeGameId) return;
+  state.quests[state.activeGameId] = (state.quests[state.activeGameId] || []).filter(q => q.id !== id);
+  saveState(); renderQuests(); renderDashboard();
+}
+
+function filterQuests(f, btn) {
+  questFilter = f;
+  document.querySelectorAll('#panel-quests .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderQuests();
+}
+
+function renderQuests() {
+  let quests = getGameData('quests');
+  if (questFilter === 'active') quests = quests.filter(q => !q.done);
+  else if (questFilter === 'done') quests = quests.filter(q => q.done);
+  else if (questFilter !== 'all') quests = quests.filter(q => q.type === questFilter);
+
+  const el = document.getElementById('questList');
+  if (!quests.length) {
+    el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-scroll"></i><p>${!state.activeGameId ? 'Select a game first.' : 'No quests found. Add your first quest!'}</p></div>`;
+    return;
+  }
+  el.innerHTML = quests.map(q => `
+    <div class="item-row ${q.done ? 'completed' : ''}">
+      <div class="priority-dot priority-${q.priority}"></div>
+      <button class="check-btn ${q.done ? 'done' : ''}" onclick="toggleQuest('${q.id}')" title="${q.done ? 'Mark incomplete' : 'Mark complete'}"></button>
+      <div class="item-main">
+        <div class="item-title">${q.name}</div>
+        <div class="item-sub">
+          <span class="badge badge-${QUEST_COLORS[q.type] || 'muted'}" style="margin-right:4px">
+            <i class="fa-solid ${QUEST_ICONS[q.type] || 'fa-circle'}"></i> ${q.type}
+          </span>
+          ${q.notes ? q.notes.slice(0, 60) + (q.notes.length > 60 ? '…' : '') : ''}
+        </div>
+      </div>
+      <div class="item-actions">
+        <button class="btn-icon btn-sm" onclick="deleteQuest('${q.id}')" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTES
+// ═══════════════════════════════════════════════════════════
+let noteFilter = 'all';
+const NOTE_ICONS = { tip:'fa-lightbulb', lore:'fa-book-open', location:'fa-map-pin', npc:'fa-user', boss:'fa-skull', build:'fa-shield-halved', other:'fa-note-sticky' };
+const NOTE_COLORS = { tip:'gold', lore:'primary', location:'accent', npc:'success', boss:'danger', build:'primary', other:'muted' };
+
+function openNoteForm() { document.getElementById('noteForm').style.display = 'block'; document.getElementById('noteTitle').focus(); }
+function closeNoteForm() { document.getElementById('noteForm').style.display = 'none'; }
+
+function addNote() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const title = document.getElementById('noteTitle').value.trim();
+  if (!title) { toast('Title required.', 'error'); return; }
+  const note = {
+    id: uid(),
+    title,
+    category: document.getElementById('noteCategory').value,
+    content: document.getElementById('noteContent').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!state.notes[state.activeGameId]) state.notes[state.activeGameId] = [];
+  state.notes[state.activeGameId].unshift(note);
+  saveState(); closeNoteForm();
+  ['noteTitle','noteContent'].forEach(id => document.getElementById(id).value = '');
+  renderNotes(); renderDashboard();
+  toast('Note saved!');
+}
+
+function deleteNote(id) {
+  if (!state.activeGameId) return;
+  state.notes[state.activeGameId] = (state.notes[state.activeGameId] || []).filter(n => n.id !== id);
+  saveState(); renderNotes(); renderDashboard();
+}
+
+function filterNotes(f, btn) {
+  noteFilter = f;
+  document.querySelectorAll('#panel-notes .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNotes();
+}
+
+function renderNotes() {
+  let notes = getGameData('notes');
+  if (noteFilter !== 'all') notes = notes.filter(n => n.category === noteFilter);
+  const el = document.getElementById('noteList');
+  if (!notes.length) {
+    el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-note-sticky"></i><p>${!state.activeGameId ? 'Select a game first.' : 'No notes yet.'}</p></div>`;
+    return;
+  }
+  el.innerHTML = notes.map(n => `
+    <div class="card-sm" style="margin-bottom:var(--space-3)">
+      <div style="display:flex;align-items:flex-start;gap:var(--space-3)">
+        <span style="font-size:1.1rem;color:var(--${NOTE_COLORS[n.category]||'primary'});flex-shrink:0;padding-top:2px">
+          <i class="fa-solid ${NOTE_ICONS[n.category]||'fa-note-sticky'}"></i>
+        </span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:var(--space-2);margin-bottom:var(--space-2);flex-wrap:wrap">
+            <strong style="font-size:var(--text-sm)">${n.title}</strong>
+            <span class="badge badge-${NOTE_COLORS[n.category]||'muted'}">${n.category}</span>
+          </div>
+          ${n.content ? `<p style="font-size:var(--text-xs);color:var(--text-muted);line-height:1.6;white-space:pre-wrap">${n.content}</p>` : ''}
+        </div>
+        <button class="btn-icon" onclick="deleteNote('${n.id}')" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MATERIALS
+// ═══════════════════════════════════════════════════════════
+let matFilter = 'all';
+const MAT_ICONS = { material:'⛏️', weapon:'⚔️', armor:'🛡️', consumable:'🧪', 'quest-item':'📜', misc:'📦' };
+
+function openMaterialForm() { document.getElementById('materialForm').style.display = 'block'; document.getElementById('matName').focus(); }
+function closeMaterialForm() { document.getElementById('materialForm').style.display = 'none'; }
+
+function addMaterial() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const name = document.getElementById('matName').value.trim();
+  if (!name) { toast('Item name required.', 'error'); return; }
+  const item = {
+    id: uid(),
+    name,
+    emoji: document.getElementById('matEmoji').value.trim() || MAT_ICONS[document.getElementById('matCategory').value] || '📦',
+    category: document.getElementById('matCategory').value,
+    qty: parseInt(document.getElementById('matQty').value) || 1,
+    notes: document.getElementById('matNotes').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!state.materials[state.activeGameId]) state.materials[state.activeGameId] = [];
+  state.materials[state.activeGameId].unshift(item);
+  saveState(); closeMaterialForm();
+  ['matName','matEmoji','matNotes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('matQty').value = '1';
+  renderMaterials(); renderDashboard();
+  toast(`${item.name} added!`);
+}
+
+function adjustQty(id, delta) {
+  const mats = getGameData('materials');
+  const m = mats.find(m => m.id === id);
+  if (m) { m.qty = Math.max(0, (m.qty || 0) + delta); saveState(); renderMaterials(); }
+}
+
+function deleteMaterial(id) {
+  if (!state.activeGameId) return;
+  state.materials[state.activeGameId] = (state.materials[state.activeGameId] || []).filter(m => m.id !== id);
+  saveState(); renderMaterials(); renderDashboard();
+}
+
+function filterMaterials(f, btn) {
+  matFilter = f;
+  document.querySelectorAll('#panel-materials .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderMaterials();
+}
+
+function renderMaterials() {
+  let mats = getGameData('materials');
+  if (matFilter !== 'all') mats = mats.filter(m => m.category === matFilter);
+  const body = document.getElementById('materialBody');
+  const empty = document.getElementById('materialEmpty');
+  if (!mats.length) {
+    body.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  body.innerHTML = mats.map(m => `
+    <tr>
+      <td style="font-size:1.2rem;width:36px">${m.emoji}</td>
+      <td><strong style="font-size:var(--text-sm)">${m.name}</strong></td>
+      <td><span class="badge badge-muted">${m.category}</span></td>
+      <td>
+        <div class="qty-cell">
+          <button class="qty-btn" onclick="adjustQty('${m.id}',-1)">−</button>
+          <span class="qty-num">${m.qty}</span>
+          <button class="qty-btn" onclick="adjustQty('${m.id}',1)">+</button>
+        </div>
+      </td>
+      <td style="font-size:var(--text-xs);color:var(--text-muted);max-width:200px">${m.notes || '—'}</td>
+      <td><button class="btn-icon" onclick="deleteMaterial('${m.id}')"><i class="fa-regular fa-trash-can"></i></button></td>
+    </tr>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════════════════════
+function loadMapEmbed() {
+  const url = document.getElementById('mapUrl').value.trim();
+  if (!url) { toast('Paste an embed URL first.', 'error'); return; }
+  state.mapUrl = url;
+  saveState();
+  renderMap();
+  toast('Map loaded!');
+}
+
+function clearMap() {
+  state.mapUrl = '';
+  document.getElementById('mapUrl').value = '';
+  saveState();
+  renderMap();
+}
+
+function renderMap() {
+  const area = document.getElementById('mapRenderArea');
+  const placeholder = document.getElementById('mapPlaceholder');
+  if (state.mapUrl) {
+    // Remove old iframe if any
+    const old = area.querySelector('iframe');
+    if (old) old.remove();
+    if (placeholder) placeholder.style.display = 'none';
+    const iframe = document.createElement('iframe');
+    iframe.src = state.mapUrl;
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('loading', 'lazy');
+    iframe.setAttribute('referrerpolicy', 'no-referrer-when-downgrade');
+    area.appendChild(iframe);
+    document.getElementById('mapUrl').value = state.mapUrl;
+  } else {
+    const old = area.querySelector('iframe');
+    if (old) old.remove();
+    if (placeholder) placeholder.style.display = 'flex';
+  }
+}
+
+// PINS
+function openPinForm() { document.getElementById('pinForm').style.display = 'block'; document.getElementById('pinName').focus(); }
+function closePinForm() { document.getElementById('pinForm').style.display = 'none'; }
+
+function addPin() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const name = document.getElementById('pinName').value.trim();
+  if (!name) { toast('Location name required.', 'error'); return; }
+  const pin = {
+    id: uid(),
+    name,
+    type: document.getElementById('pinType').value,
+    coords: document.getElementById('pinCoords').value.trim()
+  };
+  if (!state.pins[state.activeGameId]) state.pins[state.activeGameId] = [];
+  state.pins[state.activeGameId].unshift(pin);
+  saveState(); closePinForm();
+  ['pinName','pinCoords'].forEach(id => document.getElementById(id).value = '');
+  renderPins();
+  toast(`"${pin.name}" pinned!`);
+}
+
+function deletePin(id) {
+  if (!state.activeGameId) return;
+  state.pins[state.activeGameId] = (state.pins[state.activeGameId] || []).filter(p => p.id !== id);
+  saveState(); renderPins();
+}
+
+const PIN_EMOJIS = { boss:'👹', chest:'📦', npc:'👤', waypoint:'📍', dungeon:'🏚️', resource:'⛏️', vendor:'🛒', custom:'⭐' };
+
+function renderPins() {
+  const pins = state.activeGameId ? (state.pins[state.activeGameId] || []) : [];
+  const el = document.getElementById('pinList');
+  const empty = document.getElementById('pinEmpty');
+  if (!pins.length) { el.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+  el.innerHTML = pins.map(p => `
+    <div class="pin-item">
+      <span class="pin-icon">${PIN_EMOJIS[p.type] || '📍'}</span>
+      <div style="flex:1;min-width:0">
+        <div class="pin-name">${p.name}</div>
+        ${p.coords ? `<div class="pin-type">${p.coords}</div>` : ''}
+      </div>
+      <span class="badge badge-muted">${p.type}</span>
+      <button class="btn-icon btn-sm" onclick="deletePin('${p.id}')"><i class="fa-regular fa-trash-can"></i></button>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// SESSION / TIMER
+// ═══════════════════════════════════════════════════════════
+let timerInterval = null, timerSeconds = 0, timerRunning = false;
+
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000);
+  document.getElementById('timerStartBtn').style.display = 'none';
+  document.getElementById('timerPauseBtn').style.display = '';
+  document.getElementById('timerStopBtn').style.display = '';
+  document.getElementById('timerResetBtn').style.display = '';
+}
+
+function pauseTimer() {
+  timerRunning = false;
+  clearInterval(timerInterval);
+  document.getElementById('timerPauseBtn').innerHTML = '<i class="fa-solid fa-play"></i> Resume';
+  document.getElementById('timerPauseBtn').onclick = resumeTimer;
+}
+
+function resumeTimer() {
+  timerRunning = true;
+  timerInterval = setInterval(() => { timerSeconds++; updateTimerDisplay(); }, 1000);
+  document.getElementById('timerPauseBtn').innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+  document.getElementById('timerPauseBtn').onclick = pauseTimer;
+}
+
+function resetTimer() {
+  clearInterval(timerInterval); timerRunning = false; timerSeconds = 0; updateTimerDisplay();
+  document.getElementById('timerStartBtn').style.display = '';
+  document.getElementById('timerPauseBtn').style.display = 'none';
+  document.getElementById('timerStopBtn').style.display = 'none';
+  document.getElementById('timerResetBtn').style.display = 'none';
+  document.getElementById('timerPauseBtn').innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
+  document.getElementById('timerPauseBtn').onclick = pauseTimer;
+}
+
+function stopTimerAndLog() {
+  clearInterval(timerInterval); timerRunning = false;
+  const mins = Math.ceil(timerSeconds / 60);
+  if (mins < 1) { toast('Session too short to log.', 'info'); resetTimer(); return; }
+  document.getElementById('sessionDuration').value = mins;
+  document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('sessionForm').style.display = 'block';
+  resetTimer();
+}
+
+function updateTimerDisplay() {
+  const h = Math.floor(timerSeconds / 3600);
+  const m = Math.floor((timerSeconds % 3600) / 60);
+  const s = timerSeconds % 60;
+  document.getElementById('timerDisplay').textContent =
+    String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+}
+
+// Mood
+let currentMood = null;
+function setMood(emoji, label) {
+  currentMood = `${emoji} ${label}`;
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('currentMood').textContent = `Mood set: ${currentMood}`;
+}
+
+function openSessionForm() {
+  document.getElementById('sessionDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('sessionForm').style.display = 'block';
+}
+function closeSessionForm() { document.getElementById('sessionForm').style.display = 'none'; }
+
+function addSession() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const date = document.getElementById('sessionDate').value;
+  const dur = document.getElementById('sessionDuration').value;
+  if (!date || !dur) { toast('Date and duration required.', 'error'); return; }
+  const session = {
+    id: uid(),
+    date,
+    duration: parseInt(dur),
+    summary: document.getElementById('sessionSummary').value.trim(),
+    mood: document.getElementById('sessionMood').value
+  };
+  if (!state.sessions[state.activeGameId]) state.sessions[state.activeGameId] = [];
+  state.sessions[state.activeGameId].unshift(session);
+  saveState(); closeSessionForm();
+  ['sessionSummary'].forEach(id => document.getElementById(id).value = '');
+  renderSessions(); renderDashboard();
+  toast(`Session logged — ${dur} mins!`);
+}
+
+function deleteSession(id) {
+  if (!state.activeGameId) return;
+  state.sessions[state.activeGameId] = (state.sessions[state.activeGameId] || []).filter(s => s.id !== id);
+  saveState(); renderSessions(); renderDashboard();
+}
+
+function renderSessions() {
+  const sessions = getGameData('sessions');
+  const el = document.getElementById('sessionList');
+  if (!sessions.length) {
+    el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-clock"></i><p>${!state.activeGameId ? 'Select a game first.' : 'No sessions logged yet.'}</p></div>`;
+    return;
+  }
+  el.innerHTML = sessions.map(s => {
+    const d = new Date(s.date);
+    const day = isNaN(d) ? '--' : d.getDate();
+    const mon = isNaN(d) ? '---' : d.toLocaleString('en', { month: 'short' }).toUpperCase();
+    return `
+    <div class="session-entry">
+      <div class="session-date"><div class="session-day">${day}</div><div class="session-mon">${mon}</div></div>
+      <div class="session-body">
+        <div class="session-title">${s.mood || ''} ${Math.round(s.duration / 60 * 10) / 10}h session</div>
+        <div class="session-meta">${s.duration} minutes played</div>
+        ${s.summary ? `<div class="session-notes">${s.summary}</div>` : ''}
+      </div>
+      <button class="btn-icon btn-sm" onclick="deleteSession('${s.id}')"><i class="fa-regular fa-trash-can"></i></button>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// BUILDS
+// ═══════════════════════════════════════════════════════════
+function openBuildForm() { document.getElementById('buildForm').style.display = 'block'; document.getElementById('buildName').focus(); }
+function closeBuildForm() { document.getElementById('buildForm').style.display = 'none'; }
+
+function addBuild() {
+  if (!state.activeGameId) { toast('Select a game first!', 'error'); return; }
+  const name = document.getElementById('buildName').value.trim();
+  if (!name) { toast('Build name required.', 'error'); return; }
+  const build = {
+    id: uid(),
+    name,
+    class: document.getElementById('buildClass').value.trim(),
+    weapon: document.getElementById('buildWeapon').value.trim(),
+    armor: document.getElementById('buildArmor').value.trim(),
+    skills: document.getElementById('buildSkills').value.trim(),
+    stats: document.getElementById('buildStats').value.trim(),
+    notes: document.getElementById('buildNotes').value.trim(),
+    createdAt: new Date().toISOString()
+  };
+  if (!state.builds[state.activeGameId]) state.builds[state.activeGameId] = [];
+  state.builds[state.activeGameId].unshift(build);
+  saveState(); closeBuildForm();
+  ['buildName','buildClass','buildWeapon','buildArmor','buildSkills','buildStats','buildNotes'].forEach(id => document.getElementById(id).value = '');
+  renderBuilds();
+  toast(`Build "${name}" saved!`);
+}
+
+function deleteBuild(id) {
+  if (!state.activeGameId) return;
+  state.builds[state.activeGameId] = (state.builds[state.activeGameId] || []).filter(b => b.id !== id);
+  saveState(); renderBuilds();
+}
+
+function renderBuilds() {
+  const builds = getGameData('builds');
+  const el = document.getElementById('buildList');
+  if (!builds.length) {
+    el.innerHTML = `<div class="empty-state"><i class="fa-solid fa-shield-halved"></i><p>${!state.activeGameId ? 'Select a game first.' : 'No builds saved yet.'}</p></div>`;
+    return;
+  }
+  el.innerHTML = builds.map(b => `
+    <div class="card" style="margin-bottom:var(--space-4)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);flex-wrap:wrap;gap:var(--space-2)">
+        <div>
+          <strong style="font-size:var(--text-sm)">${b.name}</strong>
+          ${b.class ? `<span class="badge badge-primary" style="margin-left:var(--space-2)">${b.class}</span>` : ''}
+        </div>
+        <button class="btn-icon btn-sm" onclick="deleteBuild('${b.id}')"><i class="fa-regular fa-trash-can"></i></button>
+      </div>
+      <div class="slot-grid">
+        ${b.weapon ? `<div class="slot-card filled"><div class="slot-icon">⚔️</div><div class="slot-label">Weapon</div><div class="slot-value">${b.weapon}</div></div>` : ''}
+        ${b.armor ? `<div class="slot-card filled"><div class="slot-icon">🛡️</div><div class="slot-label">Armor</div><div class="slot-value">${b.armor}</div></div>` : ''}
+        ${b.skills ? `<div class="slot-card filled"><div class="slot-icon">✨</div><div class="slot-label">Skills</div><div class="slot-value">${b.skills}</div></div>` : ''}
+        ${b.stats ? `<div class="slot-card filled"><div class="slot-icon">📊</div><div class="slot-label">Stats</div><div class="slot-value">${b.stats}</div></div>` : ''}
+      </div>
+      ${b.notes ? `<p style="font-size:var(--text-xs);color:var(--text-muted);line-height:1.6;border-top:1px solid var(--divider);padding-top:var(--space-3);margin-top:var(--space-1)">${b.notes}</p>` : ''}
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// QUICK NOTE
+// ═══════════════════════════════════════════════════════════
+function saveQuickNote() {
+  state.quickNote = document.getElementById('quickNoteArea').value;
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTION SYNC
+// ═══════════════════════════════════════════════════════════
+function saveNotionConfig() {
+  state.notionToken = document.getElementById('notionToken').value;
+  state.notionDbId = document.getElementById('notionDbId').value;
+  saveState();
+}
+
+function setSyncStatus(status, label) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncStatus');
+  dot.className = `sync-dot ${status}`;
+  txt.textContent = label;
+}
+
+async function syncToNotion() {
+  const token = state.notionToken;
+  const dbId = state.notionDbId;
+  if (!token || !dbId) { toast('Add your Notion token and Database ID first.', 'error'); return; }
+  setSyncStatus('syncing', 'Syncing...');
+
+  const game = state.games.find(g => g.id === state.activeGameId);
+  const gameName = game ? game.name : 'Quest Log';
+  const quests = getGameData('quests');
+  const notes = getGameData('notes');
+  const sessions = getGameData('sessions');
+
+  // Build Notion page blocks
+  const blocks = [];
+
+  if (quests.length) {
+    blocks.push({ object:'block', type:'heading_2', heading_2:{ rich_text:[{ type:'text', text:{ content:'Quests' } }] } });
+    quests.forEach(q => {
+      blocks.push({
+        object:'block', type:'to_do',
+        to_do:{ rich_text:[{ type:'text', text:{ content:`[${q.type.toUpperCase()}] ${q.name}${q.notes ? ' — '+q.notes : ''}` } }], checked: q.done }
+      });
+    });
+  }
+
+  if (notes.length) {
+    blocks.push({ object:'block', type:'heading_2', heading_2:{ rich_text:[{ type:'text', text:{ content:'Notes' } }] } });
+    notes.forEach(n => {
+      blocks.push({ object:'block', type:'callout', callout:{ rich_text:[{ type:'text', text:{ content:`[${n.category}] ${n.title}: ${n.content}` } }], icon:{ type:'emoji', emoji:'📝' } } });
+    });
+  }
+
+  if (sessions.length) {
+    blocks.push({ object:'block', type:'heading_2', heading_2:{ rich_text:[{ type:'text', text:{ content:'Sessions' } }] } });
+    sessions.slice(0,5).forEach(s => {
+      blocks.push({ object:'block', type:'bulleted_list_item', bulleted_list_item:{ rich_text:[{ type:'text', text:{ content:`${s.date} · ${s.duration}min ${s.mood||''} — ${s.summary||'No summary'}` } }] } });
+    });
+  }
+
+  const payload = {
+    parent: { database_id: dbId },
+    properties: {
+      Name: { title: [{ text: { content: `${gameName} — Quest Log ${new Date().toLocaleDateString()}` } }] }
+    },
+    children: blocks
+  };
+
+  try {
+    const resp = await fetch('https://api.notion.com/v1/pages', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Notion-Version': '2022-06-28',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    if (resp.ok) {
+      setSyncStatus('synced', `Synced ${new Date().toLocaleTimeString()}`);
+      toast('Synced to Notion!');
+    } else {
+      const err = await resp.json();
+      setSyncStatus('error', 'Sync failed');
+      toast(`Notion error: ${err.message || 'Check your token and DB ID.'}`, 'error');
+    }
+  } catch(e) {
+    setSyncStatus('error', 'Network error');
+    toast('Network error — check your connection.', 'error');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT / IMPORT
+// ═══════════════════════════════════════════════════════════
+function getExportData() {
+  return JSON.stringify({
+    exportedAt: new Date().toISOString(),
+    games: state.games,
+    quests: state.quests,
+    notes: state.notes,
+    materials: state.materials,
+    sessions: state.sessions,
+    builds: state.builds,
+    pins: state.pins,
+    quickNote: state.quickNote
+  }, null, 2);
+}
+
+function refreshExportPreview() {
+  document.getElementById('exportPreview').textContent = getExportData();
+}
+
+function exportJSON() {
+  const data = getExportData();
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'questlog-backup.json'; a.click();
+  URL.revokeObjectURL(url);
+  toast('JSON downloaded!');
+}
+
+function copyExport() {
+  navigator.clipboard.writeText(getExportData()).then(() => toast('Copied to clipboard!')).catch(() => toast('Copy failed.', 'error'));
+}
+
+function importJSON() { document.getElementById('importFile').click(); }
+
+function loadImportFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.games) state.games = data.games;
+      if (data.quests) state.quests = data.quests;
+      if (data.notes) state.notes = data.notes;
+      if (data.materials) state.materials = data.materials;
+      if (data.sessions) state.sessions = data.sessions;
+      if (data.builds) state.builds = data.builds;
+      if (data.pins) state.pins = data.pins;
+      if (data.quickNote) state.quickNote = data.quickNote;
+      saveState(); renderAll();
+      toast('Data imported successfully!');
+    } catch(err) {
+      toast('Invalid JSON file.', 'error');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ═══════════════════════════════════════════════════════════
+// NOTION PAGE GENERATOR
+// ═══════════════════════════════════════════════════════════
+function generateNotionPage() {
+  const game = state.games.find(g => g.id === state.activeGameId);
+  const gameName = game ? `${game.emoji} ${game.name}` : 'Quest Log';
+  const quests = getGameData('quests');
+  const notes = getGameData('notes');
+  const sessions = getGameData('sessions');
+  const mats = getGameData('materials');
+  const builds = getGameData('builds');
+
+  let out = `# ${gameName} — Quest Log\n\n`;
+  out += `*Exported: ${new Date().toLocaleString()}*\n\n`;
+
+  if (quests.length) {
+    out += `## Quests\n\n`;
+    quests.forEach(q => out += `- [${q.done ? 'x' : ' '}] **[${q.type.toUpperCase()}]** ${q.name}${q.notes ? ' — *'+q.notes+'*' : ''}\n`);
+    out += '\n';
+  }
+
+  if (notes.length) {
+    out += `## Notes\n\n`;
+    notes.forEach(n => out += `### ${n.title}\n*${n.category}*\n\n${n.content}\n\n`);
+  }
+
+  if (mats.length) {
+    out += `## Materials / Inventory\n\n`;
+    out += `| Item | Category | Qty | Notes |\n| --- | --- | --- | --- |\n`;
+    mats.forEach(m => out += `| ${m.emoji} ${m.name} | ${m.category} | ${m.qty} | ${m.notes || ''} |\n`);
+    out += '\n';
+  }
+
+  if (sessions.length) {
+    out += `## Session Log\n\n`;
+    sessions.forEach(s => out += `- **${s.date}** · ${s.duration}min ${s.mood || ''} — ${s.summary || 'No summary'}\n`);
+    out += '\n';
+  }
+
+  if (builds.length) {
+    out += `## Builds\n\n`;
+    builds.forEach(b => {
+      out += `### ${b.name}${b.class ? ' ('+b.class+')' : ''}\n`;
+      if (b.weapon) out += `- **Weapon:** ${b.weapon}\n`;
+      if (b.armor) out += `- **Armor:** ${b.armor}\n`;
+      if (b.skills) out += `- **Skills:** ${b.skills}\n`;
+      if (b.stats) out += `- **Stats:** ${b.stats}\n`;
+      if (b.notes) out += `\n*${b.notes}*\n`;
+      out += '\n';
+    });
+  }
+
+  document.getElementById('notionPagePreview').textContent = out;
+}
+
+function copyNotionPage() {
+  const content = document.getElementById('notionPagePreview').textContent;
+  navigator.clipboard.writeText(content).then(() => toast('Notion page copied!')).catch(() => toast('Copy failed.', 'error'));
+}
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ALL
+// ═══════════════════════════════════════════════════════════
+function renderAll() {
+  renderActiveGameSelect();
+  renderGames();
+  renderDashboard();
+  renderQuests();
+  renderNotes();
+  renderMaterials();
+  renderSessions();
+  renderBuilds();
+  renderPins();
+  renderMap();
+  document.getElementById('quickNoteArea').value = state.quickNote || '';
+  document.getElementById('notionToken').value = state.notionToken || '';
+  document.getElementById('notionDbId').value = state.notionDbId || '';
+  applyTheme(state.theme);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+loadState();
+renderAll();
+</script>
+</body>
+</html>
